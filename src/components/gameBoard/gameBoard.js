@@ -17,8 +17,8 @@ const gameBoardFactory = () => {
       ship.location = location;
     },
 
-    // On hit - Returns hit ship.
-    // On miss - Returns null.
+    // Returns hit ship object on hit.
+    // Returns null on miss..
     receiveAttack(attack) {
       // For every ship
       for (var i = 0; i < this.shipCollection.length; i++) {
@@ -39,6 +39,19 @@ const gameBoardFactory = () => {
       this.missedHits.push(attack);
 
       return null;
+    },
+
+    // Returns true if move is valid.
+    // Returns false otherwise.
+    isValidMove(attack) {
+      // Return if attack was already made
+      for (var i = 0; i < this.missedHits.length; i++) {
+        if (compareSpots(attack, this.missedHits[i])) {
+          return false;
+        }
+      }
+
+      return true;
     },
   };
 
