@@ -1,3 +1,5 @@
+const shipFactory = require("../ship/ship");
+
 function compareSpots(spot1, spot2) {
   if (JSON.stringify(spot1) === JSON.stringify(spot2)) {
     return true;
@@ -12,7 +14,8 @@ const gameBoardFactory = () => {
     missedAttacks: [],
     hitAttacks: [],
 
-    placeShip(ship, location) {
+    placeShip(shipName, location) {
+      var ship = shipFactory(shipName, location);
       this.shipCollection.push(ship);
 
       ship.location = location;
