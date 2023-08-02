@@ -1,9 +1,12 @@
 const shipFactory = (health) => {
   const ship = {
     health: health,
+    length: health,
+    timesHit: 0,
 
     hit() {
-      this.health = this.health - 1;
+      this.health -= 1;
+      this.timesHit += 1;
     },
 
     isSunk() {
