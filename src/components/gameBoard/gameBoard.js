@@ -9,7 +9,8 @@ function compareSpots(spot1, spot2) {
 const gameBoardFactory = () => {
   const gameBoard = {
     shipCollection: [],
-    missedHits: [],
+    missedAttacks: [],
+    hitAttacks: [],
 
     placeShip(ship, location) {
       this.shipCollection.push(ship);
@@ -30,13 +31,14 @@ const gameBoardFactory = () => {
 
           if (compareSpots(spot, attack)) {
             ship.hit();
+            this.hitAttacks.push(attack);
             return ship;
           }
         }
       }
 
       // Mark missed location
-      this.missedHits.push(attack);
+      this.missedAttacks.push(attack);
 
       return null;
     },
@@ -45,8 +47,14 @@ const gameBoardFactory = () => {
     // Returns false otherwise.
     isValidMove(attack) {
       // Return if attack was already made
-      for (var i = 0; i < this.missedHits.length; i++) {
-        if (compareSpots(attack, this.missedHits[i])) {
+      for (var i = 0; i < this.missedAttacks.length; i++) {
+        if (compareSpots(attack, this.missedAttacks[i])) {
+          return false;
+        }
+      }
+
+      for (var i = 0; i < this.hitAttacks.length; i++) {
+        if (compareSpots(attack, this.hitAttacks[i])) {
           return false;
         }
       }
