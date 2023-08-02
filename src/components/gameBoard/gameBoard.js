@@ -9,6 +9,7 @@ function compareSpots(spot1, spot2) {
 const gameBoardFactory = () => {
   const gameBoard = {
     shipCollection: [],
+    missedHits: [],
 
     placeShip(ship, location) {
       this.shipCollection.push(ship);
@@ -30,10 +31,12 @@ const gameBoardFactory = () => {
           if (compareSpots(spot, attack)) {
             ship.hit();
             return ship;
-          } else {
           }
         }
       }
+
+      // Mark missed location
+      this.missedHits.push(attack);
 
       return null;
     },
