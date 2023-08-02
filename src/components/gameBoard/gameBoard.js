@@ -64,6 +64,20 @@ const gameBoardFactory = () => {
 
       return true;
     },
+
+    // Returns true if every ship is sunk.
+    // Returns false if any ship is still not sunk.
+    allShipsSunk() {
+      for (var i = 0; i < this.shipCollection.length; i++) {
+        var ship = this.shipCollection[i];
+
+        if (!ship.isSunk()) {
+          return false;
+        }
+      }
+
+      return true;
+    },
   };
 
   return gameBoard;
