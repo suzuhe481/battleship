@@ -1,5 +1,6 @@
-const shipFactory = (health, location) => {
+const shipFactory = (name, health, location) => {
   const ship = {
+    name: name,
     health: health,
     length: health,
     timesHit: 0,
