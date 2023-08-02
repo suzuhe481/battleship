@@ -1,8 +1,26 @@
-const shipFactory = (name, health, location) => {
+const defaultShips = {
+  carrier: {
+    startingHealth: 5,
+  },
+  battleship: {
+    startingHealth: 4,
+  },
+  destroyer: {
+    startingHealth: 3,
+  },
+  submarine: {
+    startingHealth: 3,
+  },
+  "patrol boat": {
+    startingHealth: 2,
+  },
+};
+
+const shipFactory = (name, location) => {
   const ship = {
     name: name,
-    health: health,
-    length: health,
+    health: defaultShips[name].startingHealth,
+    length: defaultShips[name].startingHealth,
     timesHit: 0,
     location: location,
 
