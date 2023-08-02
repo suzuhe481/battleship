@@ -1,4 +1,4 @@
-const shipFactory = require("../ship/ship");
+const ShipFactory = require("../ship/ship");
 
 function compareSpots(spot1, spot2) {
   if (JSON.stringify(spot1) === JSON.stringify(spot2)) {
@@ -8,14 +8,14 @@ function compareSpots(spot1, spot2) {
   return false;
 }
 
-const gameBoardFactory = () => {
+const GameBoardFactory = () => {
   const gameBoard = {
     shipCollection: [],
     missedAttacks: [],
     hitAttacks: [],
 
     placeShip(shipName, location) {
-      var ship = shipFactory(shipName, location);
+      var ship = ShipFactory(shipName, location);
       this.shipCollection.push(ship);
 
       ship.location = location;
@@ -83,4 +83,4 @@ const gameBoardFactory = () => {
   return gameBoard;
 };
 
-module.exports = gameBoardFactory;
+module.exports = GameBoardFactory;

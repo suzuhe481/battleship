@@ -16,7 +16,7 @@ const defaultShips = {
   },
 };
 
-const shipFactory = (name, location) => {
+const ShipFactory = (name, location) => {
   const ship = {
     name: name,
     health: defaultShips[name].startingHealth,
@@ -37,4 +37,4 @@ const shipFactory = (name, location) => {
   return ship;
 };
 
-module.exports = shipFactory;
+module.exports = ShipFactory;
