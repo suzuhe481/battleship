@@ -4,7 +4,7 @@ const Game = () => {
   const game = {
     gameStart() {
       const player1 = Player("Player 1");
-      const player2 = Player("Player 2");
+      const player2 = Player("Computer");
     },
   };
 
