@@ -1,6 +1,10 @@
 import "./cell.css";
 
-const Cell = (label) => {
+const numToLetter = (num) => {
+  return String.fromCharCode(num + 64);
+};
+
+const Cell = (label, row, col) => {
   const cell = document.createElement("div");
   cell.classList.add("cell");
 
@@ -24,6 +28,8 @@ const Cell = (label) => {
   // Playable cell
   else {
     cell.classList.add("playable-cell");
+    cell.dataset.letter = numToLetter(col);
+    cell.dataset.number = row;
   }
 
   return cell;
