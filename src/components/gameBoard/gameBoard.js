@@ -1,6 +1,6 @@
 const ShipFactory = require("../ship/ship");
 
-function compareSpots(spot1, spot2) {
+function isSameSpot(spot1, spot2) {
   if (JSON.stringify(spot1) === JSON.stringify(spot2)) {
     return true;
   }
@@ -32,7 +32,7 @@ const GameBoardFactory = () => {
         for (var j = 0; j < ship.location.length; j++) {
           var spot = ship.location[j];
 
-          if (compareSpots(spot, attack)) {
+          if (isSameSpot(spot, attack)) {
             ship.hit();
             this.hitAttacks.push(attack);
             return ship;
@@ -51,13 +51,13 @@ const GameBoardFactory = () => {
     isValidMove(attack) {
       // Return if attack was already made
       for (var i = 0; i < this.missedAttacks.length; i++) {
-        if (compareSpots(attack, this.missedAttacks[i])) {
+        if (isSameSpot(attack, this.missedAttacks[i])) {
           return false;
         }
       }
 
       for (var i = 0; i < this.hitAttacks.length; i++) {
-        if (compareSpots(attack, this.hitAttacks[i])) {
+        if (isSameSpot(attack, this.hitAttacks[i])) {
           return false;
         }
       }
