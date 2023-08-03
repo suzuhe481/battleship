@@ -7,10 +7,10 @@ const GameBoards = () => {
   gameBoards.classList.add("gameboards");
 
   const player1Board = OneBoard();
-  player1Board.id = "player1";
+  player1Board.id = "player1-board";
 
   const player2Board = OneBoard();
-  player2Board.id = "player2";
+  player2Board.id = "player2-board";
 
   gameBoards.appendChild(player1Board);
   gameBoards.appendChild(player2Board);
