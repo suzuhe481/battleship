@@ -129,9 +129,20 @@ const runAttack = (event) => {
     }
   }
 
-  switchPlayers();
-
-  enableEnemyBoard();
+  // Switches player after a second
+  setTimeout(function () {
+    if (results !== null && results.isSunk()) {
+      setTimeout(function () {
+        setMessage("");
+        switchPlayers();
+        enableEnemyBoard();
+      }, 1000);
+    } else {
+      setMessage("");
+      switchPlayers();
+      enableEnemyBoard();
+    }
+  }, 1500);
 };
 
 // Switches current player
