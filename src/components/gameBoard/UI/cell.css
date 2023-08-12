@@ -5,3 +5,34 @@
 
   border: 1px solid black;
 }
+
+/* The player's selected ship. */
+.cell.ship {
+  background-color: lightgray;
+}
+
+/* When playing, color of highlighted cell */
+.cell.active:hover {
+  background-color: lightgray;
+}
+
+/* When placing ship, color of a valid position to place a ship */
+.cell.valid:hover,
+.cell.highlight {
+  background-color: rgb(114, 243, 114);
+}
+
+/* Color of an invalid position to palce ship. */
+.cell.invalid:hover {
+  background-color: rgb(255, 73, 73);
+}
+
+/* Cell stylings on hit */
+.cell .fa-explosion {
+  color: #ff0000;
+}
+
+/* Cell stylings on miss */
+.cell .fa-water {
+  color: #0f12aa;
+}
