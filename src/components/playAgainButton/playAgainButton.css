@@ -1,0 +1,10 @@
+#play-again-button {
+  border: none;
+  border-radius: 15px;
+
+  display: none;
+
+  background-color: lightgray;
+
+  padding: 5px 20px;
+}
