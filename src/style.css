@@ -24,4 +24,5 @@
 #game-message,
 #game-turn-status {
   padding: 5px 0;
+  height: 1rem;
 }
