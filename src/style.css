@@ -1,0 +1,27 @@
+#game-message-container {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-around;
+  align-items: center;
+
+  padding: 10px 20px;
+}
+
+#game-button-container {
+  display: flex;
+  flex-direction: row;
+
+  justify-content: space-around;
+
+  padding: 10px 20px;
+}
+
+#game-turn-status {
+  display: none;
+}
+
+#game-message,
+#game-turn-status {
+  padding: 5px 0;
+}
