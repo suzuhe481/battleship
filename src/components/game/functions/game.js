@@ -18,7 +18,10 @@ var currentShipLength = 5;
 var player1Ships = {};
 var player2Ships = {};
 
-// Test ship locations. Should be an empty object.
+const timeBetweenTurns = 1000;
+const timeAddedOnShipDestroyed = 1000;
+
+// Debug Test ship locations. Should be an empty object.
 var player2ShipsTest = {
   carrier: [
     ["F", 1],
@@ -143,13 +146,13 @@ const runAttack = (event) => {
         setGameMessage("");
         switchPlayers();
         enableEnemyBoard();
-      }, 1000);
+      }, timeBetweenTurns);
     } else {
       setGameMessage("");
       switchPlayers();
       enableEnemyBoard();
     }
-  }, 1500);
+  }, timeAddedOnShipDestroyed);
 };
 
 // Switches current player
@@ -162,6 +165,8 @@ const switchPlayers = () => {
 // Displays winning message.
 const gameWon = () => {
   disableEnemyBoard();
+
+  revealEnemyShips();
 
   var turnStatus = document.getElementById("game-turn-status");
   turnStatus.style.display = "none";
@@ -556,6 +561,8 @@ const storeShipAndSwitchOrStartGame = (shipLocation) => {
       currentShipPlacement = null;
 
       player2Ships = placeRandomComputerShips();
+      // Debug
+      console.log(player2Ships);
 
       placeShips(player1Ships, player2Ships);
 
@@ -593,8 +600,6 @@ const placeRandomComputerShips = () => {
   var patrolBoatLocation = getSingleComputerShipLocation(2, shipLocations);
   shipLocations["patrol boat"] = patrolBoatLocation;
 
-  console.log(shipLocations);
-
   return shipLocations;
 };
 
@@ -607,22 +612,22 @@ const getSingleComputerShipLocation = (shipLength, shipLocations) => {
   // A letter as a string.
   // A number as an int.
   const isSpotValidandOnBoard = (posArr) => {
+    var letter = posArr[0];
+    var number = posArr[1];
+
+    // Checks if letter is outside of valid range of "A" and "J".
+    if (letter.charCodeAt(0) < 65 || letter.charCodeAt(0) > 74) {
+      return false;
+    }
+
+    // Checks if number is outside of valid range of 1 and 10.
+    if (number < 1 || number > 10) {
+      return false;
+    }
+
+    // Checks if posArr is currently taken.
     for (var i = 0; i < shipLocations1D.length; i++) {
-      // Checks if position is taken.
       if (areArraysEqual(posArr, shipLocations1D[i])) {
-        return false;
-      }
-
-      var letter = posArr[0];
-      var number = posArr[1];
-
-      // Checks if letter is outside of valid range of "A" and "J".
-      if (letter.charCodeAt(0) < 65 || letter.charCodeAt(0) > 74) {
-        return false;
-      }
-
-      // Checks if number is outside of valid range of 1 and 10.
-      if (number < 1 || number > 10) {
         return false;
       }
     }
@@ -731,6 +736,44 @@ const getSingleComputerShipLocation = (shipLength, shipLocations) => {
   return location;
 };
 
+// Reveals the enemy ships.
+const revealEnemyShips = () => {
+  var enemy;
+  // Gets the computer player.
+  if (player1.name === "Computer") {
+    enemy = player1;
+  } else {
+    enemy = player2;
+  }
+
+  // Initializing variable.
+  var allShipLocations = [];
+
+  // Gets the locations for every ship.
+  for (var ship of enemy.board.shipCollection) {
+    allShipLocations.push(ship.location);
+  }
+
+  // Flattens shipLocations into a 1D array.
+  allShipLocations = allShipLocations.flat();
+
+  for (var i = 0; i < allShipLocations.length; i++) {
+    var cell = getComputerCellFromArray(allShipLocations[i]);
+    cell.classList.add("ship");
+  }
+};
+
+// Returns the cell element on the Computer's board given an array position.
+const getComputerCellFromArray = (posArr) => {
+  var letter = String(posArr[0]);
+  var number = String(posArr[1]);
+  var queryString = `#player2-board > .cell[data-letter="${letter}"][data-number="${number}"]`;
+
+  var cell = document.querySelector(queryString);
+
+  return cell;
+};
+
 // Placing ships for player1 and player2 on the board.
 const placeShips = (player1Ships, player2Ships) => {
   // Player 1 ship placement
@@ -764,9 +807,5 @@ const rotate = () => {
   // Back to picking ship
   pickShipLocations();
 };
-
-// const Game = () => {
-//   pickShipLocations();
-// };
 
 export { rotate, pickShipLocations, resetGame };
