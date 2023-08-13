@@ -16,9 +16,10 @@ var currentShipPlacement = "carrier";
 var currentShipLength = 5;
 
 var player1Ships = {};
+var player2Ships = {};
 
-// TEst ship locations. Should be an empty object.
-var player2Ships = {
+// Test ship locations. Should be an empty object.
+var player2ShipsTest = {
   carrier: [
     ["F", 1],
     ["G", 1],
@@ -86,6 +87,8 @@ const disableEnemyBoard = () => {
   });
 };
 
+// Attacks based on cell clicked.
+
 const runAttack = (event) => {
   disableEnemyBoard();
 
@@ -96,8 +99,9 @@ const runAttack = (event) => {
 
   var cellElement = event.target;
 
-  var gameMessage = document.getElementById("game-message");
-  gameMessage.innerHTML = "";
+  setGameMessage("");
+  // var gameMessage = document.getElementById("game-message");
+  // gameMessage.innerHTML = "";
 
   // Results is null if miss.
   // Results is hit ship object if hit.
@@ -105,13 +109,15 @@ const runAttack = (event) => {
 
   // Displays attack results
   if (results === null) {
-    gameMessage.innerHTML = `Attack at [${coordinates}] missed.`;
+    setGameMessage(`Attack at [${coordinates}] missed.`);
+    // gameMessage.innerHTML = `Attack at [${coordinates}] missed.`;
 
     var missIcon = CreateMissIcon();
     cellElement.appendChild(missIcon);
     cellElement.classList.remove("playable-cell");
   } else {
-    gameMessage.innerHTML = `Attack at [${coordinates}] hit!`;
+    setGameMessage(`Attack at [${coordinates}] hit!`);
+    // gameMessage.innerHTML = `Attack at [${coordinates}] hit!`;
 
     var hitIcon = CreateHitIcon();
     cellElement.appendChild(hitIcon);
@@ -119,7 +125,8 @@ const runAttack = (event) => {
 
     // Checks is ship was sunk
     if (results.isSunk()) {
-      gameMessage.innerHTML += `\n The ${results.name} was sunk!`;
+      setGameMessage(`\n The ${results.name} was sunk!`);
+      // gameMessage.innerHTML += `\n The ${results.name} was sunk!`;
     }
 
     // Checks game win condition
@@ -133,12 +140,12 @@ const runAttack = (event) => {
   setTimeout(function () {
     if (results !== null && results.isSunk()) {
       setTimeout(function () {
-        setMessage("");
+        setGameMessage("");
         switchPlayers();
         enableEnemyBoard();
       }, 1000);
     } else {
-      setMessage("");
+      setGameMessage("");
       switchPlayers();
       enableEnemyBoard();
     }
@@ -159,9 +166,10 @@ const gameWon = () => {
   var turnStatus = document.getElementById("game-turn-status");
   turnStatus.style.display = "none";
 
-  var gameMessage = document.getElementById("game-message");
-  gameMessage.innerHTML = "";
-  gameMessage.innerHTML = `${currPlayer.name} Wins!`;
+  setGameTurnStatus(`${currPlayer.name} Wins!`);
+  // var gameMessage = document.getElementById("game-message");
+  // gameMessage.innerHTML = "";
+  // gameMessage.innerHTML = `${currPlayer.name} Wins!`;
 
   var resetButton = document.getElementById("play-again-button");
   resetButton.style.display = "block";
@@ -169,8 +177,9 @@ const gameWon = () => {
 
 // Starts the game and resets cells to starting positions.
 const gameStart = () => {
-  var gameMessage = document.getElementById("game-message");
-  gameMessage.innerHTML = "";
+  setGameMessage("");
+  // var gameMessage = document.getElementById("game-message");
+  // gameMessage.innerHTML = "";
 
   var rotateButton = document.getElementById("rotate-ship-button");
   rotateButton.style.display = "none";
@@ -193,39 +202,11 @@ const resetGame = () => {
 
   // Empties ship locations
   player1Ships = {};
-  // player2Ships = {};
   player2Ships = placeRandomComputerShips();
-  // var player2Ships = {
-  //   carrier: [
-  //     ["F", 1],
-  //     ["G", 1],
-  //     ["H", 1],
-  //     ["I", 1],
-  //     ["J", 1],
-  //   ],
-  //   battleship: [
-  //     ["A", 7],
-  //     ["A", 8],
-  //     ["A", 9],
-  //     ["A", 10],
-  //   ],
-  //   destroyer: [
-  //     ["C", 6],
-  //     ["D", 6],
-  //     ["E", 6],
-  //   ],
-  //   submarine: [
-  //     ["F", 8],
-  //     ["F", 9],
-  //     ["F", 10],
-  //   ],
-  //   "patrol boat": [
-  //     ["A", 3],
-  //     ["B", 3],
-  //   ],
-  // };
 
+  // Resets rotate direction to horizontal.
   horizontal = true;
+
   // Displays rotate button.
   var rotateButton = document.getElementById("rotate-ship-button");
   rotateButton.style.display = "block";
@@ -235,27 +216,6 @@ const resetGame = () => {
   var gameBoardsContainer = document.getElementById("gameboards-container");
   gameBoardsContainer.innerHTML = "";
   gameBoardsContainer.appendChild(GameBoards());
-
-  // Gets cells that are not labels or the nonplayable corner cell.
-  // var player1CellsQuery =
-  //   "#player1-board > .cell:not(.letter-label):not(.number-label):not(.non-playable)";
-  // var player2CellsQuery =
-  //   "#player2-board > .cell:not(.letter-label):not(.number-label):not(.non-playable)";
-
-  // var player1Cells = document.querySelectorAll(player1CellsQuery);
-  // var player2Cells = document.querySelectorAll(player2CellsQuery);
-
-  // Resets classes for player 1 and computer cells.
-  // player1Cells.forEach((cell) => {
-  //   cell.classList.remove("ship", "highlight", "hit", "miss");
-  //   cell.classList.add("playable-cell");
-  //   cell.innerHTML = ""; // Removes children.
-  // });
-  // player2Cells.forEach((cell) => {
-  //   cell.classList.remove("ship", "highlight", "hit", "miss");
-  //   cell.classList.add("playable-cell");
-  //   cell.innerHTML = ""; // Removes children.
-  // });
 
   // Sets ship placement to carrier.
   currentShipPlacement = "carrier";
@@ -267,30 +227,23 @@ const resetGame = () => {
 // Enables picking a location of a ship for player 1.
 // The ship being placed is determined by currentShipPlacement.
 const pickShipLocations = () => {
-  setMessage(`Place your ${currentShipPlacement}`);
-
-  // var shipLength;
+  setGameMessage(`Place your ${currentShipPlacement}`);
 
   switch (currentShipPlacement) {
     case "carrier":
       currentShipLength = 5;
-      // shipLength = 5;
       break;
     case "battleship":
       currentShipLength = 4;
-      // shipLength = 4;
       break;
     case "destroyer":
       currentShipLength = 3;
-      // shipLength = 3;
       break;
     case "submarine":
       currentShipLength = 3;
-      // shipLength = 3;
       break;
     case "patrol boat":
       currentShipLength = 2;
-      // shipLength = 2;
       break;
   }
 
@@ -362,8 +315,6 @@ const getValidandInvalidHorizontalCells = () => {
   var queryString = "#player1-board > .cell.playable-cell";
   var player1Cells = document.querySelectorAll(queryString);
 
-  // var shipLength;
-
   var validCells = [];
   var inValidCells = [];
 
@@ -371,23 +322,18 @@ const getValidandInvalidHorizontalCells = () => {
     switch (currentShipPlacement) {
       case "carrier":
         currentShipLength = 5;
-        // shipLength = 5;
         break;
       case "battleship":
         currentShipLength = 4;
-        // shipLength = 4;
         break;
       case "destroyer":
         currentShipLength = 3;
-        // shipLength = 3;
         break;
       case "submarine":
         currentShipLength = 3;
-        // shipLength = 3;
         break;
       case "patrol boat":
         currentShipLength = 2;
-        // shipLength = 2;
         break;
     }
 
@@ -417,8 +363,6 @@ const getValidandInvalidVerticalCells = () => {
   var queryString = "#player1-board > .cell.playable-cell";
   var player1Cells = document.querySelectorAll(queryString);
 
-  // var shipLength;
-
   var validCells = [];
   var inValidCells = [];
 
@@ -426,23 +370,18 @@ const getValidandInvalidVerticalCells = () => {
     switch (currentShipPlacement) {
       case "carrier":
         currentShipLength = 5;
-        // shipLength = 5;
         break;
       case "battleship":
         currentShipLength = 4;
-        // shipLength = 4;
         break;
       case "destroyer":
         currentShipLength = 3;
-        // shipLength = 3;
         break;
       case "submarine":
         currentShipLength = 3;
-        // shipLength = 3;
         break;
       case "patrol boat":
         currentShipLength = 2;
-        // shipLength = 2;
         break;
     }
 
@@ -467,7 +406,6 @@ const getValidandInvalidVerticalCells = () => {
 // Adds a class to the valid ship cells.
 const highlightShips = (event) => {
   var currCell = event.target;
-  // var shipLength = event.target.shipLength;
 
   currCell.classList.toggle("highlight");
 
@@ -480,14 +418,6 @@ const highlightShips = (event) => {
       currCell.classList.toggle("highlight");
     }
   }
-};
-
-// Probably not needed
-// Adds class to invalid cells.
-const highlightInvalid = (event) => {
-  var currCell = event.target;
-
-  currCell.classList.toggle("invalid");
 };
 
 // Gets player1's cell with the given letter and number position.
@@ -547,21 +477,8 @@ const setAllPlayer1CellsToDefaultClasses = () => {
   });
 };
 
-// Not needed
-const setCellToDefaultClasses = (cell) => {
-  var classList = cell.classList;
-
-  while (classList.length > 0) {
-    classList.remove(classList.item(0));
-  }
-
-  cell.classList.add("cell", "playable-cell");
-
-  return cell;
-};
-
 // Sets game message text.
-const setMessage = (message) => {
+const setGameMessage = (message) => {
   var messageBox = document.getElementById("game-message");
 
   messageBox.innerHTML = "";
@@ -580,7 +497,6 @@ const setGameTurnStatus = (message) => {
 // Stores ship location on a valid click.
 const selectedShipLocation = (event) => {
   var location = [];
-  // var shipLength = event.target.shipLength;
   setAllPlayer1CellsToDefaultClasses();
 
   var cell = event.target;
@@ -682,6 +598,8 @@ const placeRandomComputerShips = () => {
   return shipLocations;
 };
 
+// Returns an array of arrays.
+// Inner array is an array of positions for the given ship's length.
 const getSingleComputerShipLocation = (shipLength, shipLocations) => {
   // Returns true if position is valid, not occupied, and on the board.
   // Returns false otherwise.
@@ -757,7 +675,7 @@ const getSingleComputerShipLocation = (shipLength, shipLocations) => {
   };
 
   // Initialize location array, positionFound boolean.
-  // Flattens all currently placed ship locations to 1D array.
+  // Flattens all currently placed ship locations to 1D array of positions.
   var location = [];
   var positionFound = false;
   var shipLocations1D = Object.values(shipLocations).flat();
@@ -813,6 +731,7 @@ const getSingleComputerShipLocation = (shipLength, shipLocations) => {
   return location;
 };
 
+// Placing ships for player1 and player2 on the board.
 const placeShips = (player1Ships, player2Ships) => {
   // Player 1 ship placement
   player1.board.placeShip("carrier", player1Ships.carrier);
@@ -846,8 +765,8 @@ const rotate = () => {
   pickShipLocations();
 };
 
-const Game = () => {
-  pickShipLocations();
-};
+// const Game = () => {
+//   pickShipLocations();
+// };
 
-export { Game, rotate, pickShipLocations, resetGame };
+export { rotate, pickShipLocations, resetGame };
