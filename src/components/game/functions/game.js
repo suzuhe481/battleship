@@ -21,37 +21,6 @@ var player2Ships = {};
 const timeBetweenTurns = 1000;
 const timeAddedOnShipDestroyed = 1000;
 
-// Debug Test ship locations. Should be an empty object.
-var player2ShipsTest = {
-  carrier: [
-    ["F", 1],
-    ["G", 1],
-    ["H", 1],
-    ["I", 1],
-    ["J", 1],
-  ],
-  battleship: [
-    ["A", 7],
-    ["A", 8],
-    ["A", 9],
-    ["A", 10],
-  ],
-  destroyer: [
-    ["C", 6],
-    ["D", 6],
-    ["E", 6],
-  ],
-  submarine: [
-    ["F", 8],
-    ["F", 9],
-    ["F", 10],
-  ],
-  "patrol boat": [
-    ["A", 3],
-    ["B", 3],
-  ],
-};
-
 // Allows the enemy board to be clicked.
 const enableEnemyBoard = () => {
   var turnStatus = document.getElementById("game-turn-status");
@@ -91,7 +60,6 @@ const disableEnemyBoard = () => {
 };
 
 // Attacks based on cell clicked.
-
 const runAttack = (event) => {
   disableEnemyBoard();
 
@@ -103,8 +71,6 @@ const runAttack = (event) => {
   var cellElement = event.target;
 
   setGameMessage("");
-  // var gameMessage = document.getElementById("game-message");
-  // gameMessage.innerHTML = "";
 
   // Results is null if miss.
   // Results is hit ship object if hit.
@@ -113,14 +79,12 @@ const runAttack = (event) => {
   // Displays attack results
   if (results === null) {
     setGameMessage(`Attack at [${coordinates}] missed.`);
-    // gameMessage.innerHTML = `Attack at [${coordinates}] missed.`;
 
     var missIcon = CreateMissIcon();
     cellElement.appendChild(missIcon);
     cellElement.classList.remove("playable-cell");
   } else {
     setGameMessage(`Attack at [${coordinates}] hit!`);
-    // gameMessage.innerHTML = `Attack at [${coordinates}] hit!`;
 
     var hitIcon = CreateHitIcon();
     cellElement.appendChild(hitIcon);
@@ -129,7 +93,6 @@ const runAttack = (event) => {
     // Checks is ship was sunk
     if (results.isSunk()) {
       setGameMessage(`\n The ${results.name} was sunk!`);
-      // gameMessage.innerHTML += `\n The ${results.name} was sunk!`;
     }
 
     // Checks game win condition
@@ -172,9 +135,6 @@ const gameWon = () => {
   turnStatus.style.display = "none";
 
   setGameTurnStatus(`${currPlayer.name} Wins!`);
-  // var gameMessage = document.getElementById("game-message");
-  // gameMessage.innerHTML = "";
-  // gameMessage.innerHTML = `${currPlayer.name} Wins!`;
 
   var resetButton = document.getElementById("play-again-button");
   resetButton.style.display = "block";
@@ -183,8 +143,6 @@ const gameWon = () => {
 // Starts the game and resets cells to starting positions.
 const gameStart = () => {
   setGameMessage("");
-  // var gameMessage = document.getElementById("game-message");
-  // gameMessage.innerHTML = "";
 
   var rotateButton = document.getElementById("rotate-ship-button");
   rotateButton.style.display = "none";
@@ -205,7 +163,7 @@ const resetGame = () => {
   currPlayer = player1;
   enemyPlayer = player2;
 
-  // Empties ship locations
+  // Empties ship locations and gets new ship locations.
   player1Ships = {};
   player2Ships = placeRandomComputerShips();
 
@@ -268,7 +226,6 @@ const pickShipLocations = () => {
       cell.addEventListener("mouseover", highlightShips, false);
       cell.addEventListener("mouseout", highlightShips, false);
       cell.addEventListener("click", selectedShipLocation, false);
-      // cell.shipLength = shipLength;
     });
 
     // Labels each invalid cell
@@ -288,8 +245,6 @@ const pickShipLocations = () => {
       cell.addEventListener("mouseover", highlightShips, false);
       cell.addEventListener("mouseout", highlightShips, false);
       cell.addEventListener("click", selectedShipLocation, false);
-
-      // cell.shipLength = shipLength;
     });
 
     // Labels each invalid cell
@@ -685,6 +640,7 @@ const getSingleComputerShipLocation = (shipLength, shipLocations) => {
   var positionFound = false;
   var shipLocations1D = Object.values(shipLocations).flat();
 
+  // Repeats until a valid ship location is found.
   while (!positionFound) {
     // Reset location array.
     location = [];
