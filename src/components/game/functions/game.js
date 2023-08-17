@@ -28,19 +28,22 @@ const enableEnemyBoard = () => {
   turnStatus.innerHTML = "";
   turnStatus.innerHTML = `It is ${currPlayer.name}'s turn.`;
 
-  if (enemyPlayer.name === "Player 1") {
-    var p1Cells = "#player1-board > .cell.playable-cell";
-    var playableCells = document.querySelectorAll(p1Cells);
-  } else {
+  // Player 1 turn - Turn on enemy board.
+  if (currPlayer.name === "Player 1") {
     var p2Cells = "#player2-board > .cell.playable-cell";
     var playableCells = document.querySelectorAll(p2Cells);
-  }
 
-  // "active" class enables color change on hover.
-  playableCells.forEach((cell) => {
-    cell.classList.add("active");
-    cell.addEventListener("click", runAttack);
-  });
+    // "active" class enables color change on hover.
+    playableCells.forEach((cell) => {
+      cell.classList.add("active");
+      cell.addEventListener("click", runAttack);
+    });
+  }
+  // Computer turn - Have computer attack
+  else {
+    var computerAttack = getComputerAttack();
+    runAttack(computerAttack);
+  }
 };
 
 // Disables the enemy board from being clicked.
@@ -63,12 +66,25 @@ const disableEnemyBoard = () => {
 const runAttack = (event) => {
   disableEnemyBoard();
 
-  // Retrieving attack coordinates
-  var letter = event.target.dataset.letter;
-  var number = parseInt(event.target.dataset.number);
-  var coordinates = [letter, number];
+  // Player 1 turn
+  if (currPlayer.name === "Player 1") {
+    // Retrieving attack coordinates
+    var letter = event.target.dataset.letter;
+    var number = parseInt(event.target.dataset.number);
+    var coordinates = [letter, number];
 
-  var cellElement = event.target;
+    var cellElement = event.target;
+  }
+  // // Computer turn
+  else {
+    // Retrieving attack coordinates
+    var pos = event;
+    var letter = pos[0];
+    var number = pos[1];
+    var coordinates = [letter, number];
+
+    var cellElement = getPlayer1Cell(letter, number);
+  }
 
   setGameMessage("");
 
@@ -516,8 +532,6 @@ const storeShipAndSwitchOrStartGame = (shipLocation) => {
       currentShipPlacement = null;
 
       player2Ships = placeRandomComputerShips();
-      // Debug
-      console.log(player2Ships);
 
       placeShips(player1Ships, player2Ships);
 
@@ -558,6 +572,54 @@ const placeRandomComputerShips = () => {
   return shipLocations;
 };
 
+// Returns an array for a random location that has not been picked yet for the computer player.
+const getComputerAttack = () => {
+  var hitAttacks = enemyPlayer.board.hitAttacks;
+  var missedAttacks = enemyPlayer.board.missedAttacks;
+  var takenSpots = hitAttacks.concat(missedAttacks);
+
+  var pos = getRandomPosition();
+  var validSpot = false;
+  while (!validSpot) {
+    // Get new pos
+    var pos = getRandomPosition();
+
+    // Checks if pos is currently taken.
+    for (var i = 0; i <= takenSpots.length; i++) {
+      // Exit loop if pos is taken.
+      if (areArraysEqual(pos, takenSpots[i])) {
+        break;
+      }
+
+      if (i === takenSpots.length) {
+        validSpot = true;
+        break;
+      }
+    }
+  }
+
+  return pos;
+};
+
+// Returns an array with a position on the board.
+const getRandomPosition = () => {
+  const characters = "ABCDEFGHIJ";
+  var letter = characters.charAt(Math.floor(Math.random() * characters.length));
+
+  var number = Math.floor(Math.random() * 10) + 1;
+
+  return [letter, number];
+};
+
+// Returns true if the 2 arrays are equal.
+const areArraysEqual = (arr1, arr2) => {
+  if (JSON.stringify(arr1) === JSON.stringify(arr2)) {
+    return true;
+  }
+
+  return false;
+};
+
 // Returns an array of arrays.
 // Inner array is an array of positions for the given ship's length.
 const getSingleComputerShipLocation = (shipLength, shipLocations) => {
@@ -591,15 +653,6 @@ const getSingleComputerShipLocation = (shipLength, shipLocations) => {
     return true;
   };
 
-  // Returns true if the 2 arrays are equal.
-  const areArraysEqual = (arr1, arr2) => {
-    if (JSON.stringify(arr1) === JSON.stringify(arr2)) {
-      return true;
-    }
-
-    return false;
-  };
-
   // Returns array of a position with the given position moved right.
   const moveRight = (cellArr) => {
     var letter = cellArr[0];
@@ -618,18 +671,6 @@ const getSingleComputerShipLocation = (shipLength, shipLocations) => {
 
     letter = letter;
     number = parseInt(number + 1);
-
-    return [letter, number];
-  };
-
-  // Returns an array with a position on the board.
-  const getRandomPosition = () => {
-    const characters = "ABCDEFGHIJ";
-    var letter = characters.charAt(
-      Math.floor(Math.random() * characters.length)
-    );
-
-    var number = Math.floor(Math.random() * 10) + 1;
 
     return [letter, number];
   };
