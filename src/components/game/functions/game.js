@@ -3,6 +3,9 @@ import CreateMissIcon from "../../gameBoard/UI/missIcon";
 
 import GameBoards from "../../gameBoard/UI/gameBoards";
 
+import * as player1Funcs from "./player1/player1";
+import * as compFuncs from "./computer/computer";
+
 const Player = require("../../player/player");
 
 var player1 = Player("Player 1");
@@ -75,7 +78,8 @@ const runAttack = (event) => {
 
     var cellElement = event.target;
   }
-  // // Computer turn
+  // Computer turn
+  // event is an array of the position
   else {
     // Retrieving attack coordinates
     var pos = event;
@@ -83,7 +87,7 @@ const runAttack = (event) => {
     var number = pos[1];
     var coordinates = [letter, number];
 
-    var cellElement = getPlayer1Cell(letter, number);
+    var cellElement = player1Funcs.getPlayer1CellElementFromArray(coordinates);
   }
 
   setGameMessage("");
@@ -163,8 +167,8 @@ const gameStart = () => {
   var rotateButton = document.getElementById("rotate-ship-button");
   rotateButton.style.display = "none";
 
-  removeAllPlayer1CellEventListeners();
-  setAllPlayer1CellsToDefaultClasses();
+  player1Funcs.removeAllPlayer1CellEventListeners();
+  player1Funcs.setAllPlayer1CellsToDefaultClasses();
 
   enableEnemyBoard();
 };
@@ -181,7 +185,7 @@ const resetGame = () => {
 
   // Empties ship locations and gets new ship locations.
   player1Ships = {};
-  player2Ships = placeRandomComputerShips();
+  player2Ships = {};
 
   // Resets rotate direction to horizontal.
   horizontal = true;
@@ -227,8 +231,8 @@ const pickShipLocations = () => {
   }
 
   // Resets each player 1's cell's classes and eventListeners
-  removeAllPlayer1CellEventListeners();
-  setAllPlayer1CellsToDefaultClasses();
+  player1Funcs.removeAllPlayer1CellEventListeners();
+  player1Funcs.setAllPlayer1CellsToDefaultClasses();
 
   // Labels valid and invalid cells when set in the horizontal position.
   if (horizontal) {
@@ -317,7 +321,7 @@ const getValidandInvalidHorizontalCells = () => {
     for (var i = 0; i < currentShipLength; i++) {
       // Check horizontal cells for if space is occupied OR is on board
       if (!isSpaceOccupied(nextRightCell)) {
-        nextRightCell = getRightCell(nextRightCell);
+        nextRightCell = player1Funcs.getPlayer1RightCellElement(nextRightCell);
       } else {
         // Invalid
         inValidCells.push(cell);
@@ -365,7 +369,7 @@ const getValidandInvalidVerticalCells = () => {
     for (var i = 0; i < currentShipLength; i++) {
       // Check vertical cells for if space is occupied
       if (!isSpaceOccupied(nextBelowCell)) {
-        nextBelowCell = getBelowCell(nextBelowCell);
+        nextBelowCell = player1Funcs.getPlayer1BelowCellElement(nextBelowCell);
       } else {
         // Invalid
         inValidCells.push(cell);
@@ -387,70 +391,13 @@ const highlightShips = (event) => {
 
   for (var i = 1; i < currentShipLength; i++) {
     if (horizontal) {
-      currCell = getRightCell(currCell);
+      currCell = player1Funcs.getPlayer1RightCellElement(currCell);
       currCell.classList.toggle("highlight");
     } else {
-      currCell = getBelowCell(currCell);
+      currCell = player1Funcs.getPlayer1BelowCellElement(currCell);
       currCell.classList.toggle("highlight");
     }
   }
-};
-
-// Gets player1's cell with the given letter and number position.
-const getPlayer1Cell = (letter, number) => {
-  var letter = String(letter);
-  var number = String(number);
-
-  var queryString = `#player1-board > .cell.playable-cell[data-letter="${letter}"][data-number="${number}"]`;
-
-  var cell = document.querySelector(queryString);
-
-  return cell;
-};
-
-// Returns the cell element to the right of the given cell.
-const getRightCell = (currCell) => {
-  var letter = currCell.dataset.letter;
-  var number = currCell.dataset.number;
-  var nextLetter = String.fromCharCode(letter.charCodeAt(0) + 1);
-
-  var rightCell = getPlayer1Cell(nextLetter, number);
-
-  return rightCell;
-};
-
-// Returns the cell element below the given cell element.
-const getBelowCell = (currCell) => {
-  var letter = currCell.dataset.letter;
-  var number = currCell.dataset.number;
-  var nextNumber = (parseInt(number) + 1).toString();
-
-  var belowCell = getPlayer1Cell(letter, nextNumber);
-
-  return belowCell;
-};
-
-// Removes every event listener for every cell in player 1's board.
-const removeAllPlayer1CellEventListeners = () => {
-  var queryString = "#player1-board > .cell.playable-cell";
-  var player1Cells = document.querySelectorAll(queryString);
-
-  player1Cells.forEach((cell) => {
-    cell.removeEventListener("mouseover", highlightShips);
-    cell.removeEventListener("mouseout", highlightShips);
-    cell.removeEventListener("click", selectedShipLocation);
-  });
-};
-
-// Resets Player 1's cells to default classes that do NOT have a ship placed on them.
-const setAllPlayer1CellsToDefaultClasses = () => {
-  var queryString = "#player1-board > .cell.playable-cell";
-  var player1Cells = document.querySelectorAll(queryString);
-
-  player1Cells.forEach((cell) => {
-    cell.classList.remove("highlight");
-    cell.classList.remove("invalid");
-  });
 };
 
 // Sets game message text.
@@ -473,14 +420,15 @@ const setGameTurnStatus = (message) => {
 // Stores ship location on a valid click.
 const selectedShipLocation = (event) => {
   var location = [];
-  setAllPlayer1CellsToDefaultClasses();
+  player1Funcs.setAllPlayer1CellsToDefaultClasses();
 
   var cell = event.target;
 
   for (var i = 0; i < currentShipLength; i++) {
     var currCellLetter = getCellLetter(cell);
     var currCellNumber = getCellNumberAsInt(cell);
-    var cell = getPlayer1Cell(currCellLetter, currCellNumber);
+    var coordinates = [currCellLetter, currCellNumber];
+    var cell = player1Funcs.getPlayer1CellElementFromArray(coordinates);
 
     cell.classList.add("ship");
     location.push([currCellLetter, currCellNumber]);
@@ -488,9 +436,9 @@ const selectedShipLocation = (event) => {
     // If ship is horizontal, get right cell.
     // If vertical, get below cell.
     if (horizontal) {
-      cell = getRightCell(cell);
+      cell = player1Funcs.getPlayer1RightCellElement(cell);
     } else {
-      cell = getBelowCell(cell);
+      cell = player1Funcs.getPlayer1BelowCellElement(cell);
     }
   }
 
@@ -531,7 +479,10 @@ const storeShipAndSwitchOrStartGame = (shipLocation) => {
       player1Ships["patrol boat"] = shipLocation;
       currentShipPlacement = null;
 
-      player2Ships = placeRandomComputerShips();
+      player2Ships = compFuncs.placeRandomComputerShips();
+
+      // Debug
+      console.log(player2Ships);
 
       placeShips(player1Ships, player2Ships);
 
@@ -547,29 +498,6 @@ const getCellLetter = (cell) => {
 // Given a cell element, returns it's Number as an Int.
 const getCellNumberAsInt = (cell) => {
   return parseInt(cell.dataset.number);
-};
-
-// Picks ships for the computer opponnent player.
-// Returns an object with 5 ships and their location arrays.
-const placeRandomComputerShips = () => {
-  var shipLocations = {};
-
-  var carrierLocation = getSingleComputerShipLocation(5, shipLocations);
-  shipLocations.carrier = carrierLocation;
-
-  var battleshipLocation = getSingleComputerShipLocation(4, shipLocations);
-  shipLocations.battleship = battleshipLocation;
-
-  var destroyerLocation = getSingleComputerShipLocation(3, shipLocations);
-  shipLocations.destroyer = destroyerLocation;
-
-  var submarineLocation = getSingleComputerShipLocation(3, shipLocations);
-  shipLocations.submarine = submarineLocation;
-
-  var patrolBoatLocation = getSingleComputerShipLocation(2, shipLocations);
-  shipLocations["patrol boat"] = patrolBoatLocation;
-
-  return shipLocations;
 };
 
 // Returns an array for a random location that has not been picked yet for the computer player.
@@ -620,119 +548,6 @@ const areArraysEqual = (arr1, arr2) => {
   return false;
 };
 
-// Returns an array of arrays.
-// Inner array is an array of positions for the given ship's length.
-const getSingleComputerShipLocation = (shipLength, shipLocations) => {
-  // Returns true if position is valid, not occupied, and on the board.
-  // Returns false otherwise.
-  // Takes in array with 2 elements.
-  // A letter as a string.
-  // A number as an int.
-  const isSpotValidandOnBoard = (posArr) => {
-    var letter = posArr[0];
-    var number = posArr[1];
-
-    // Checks if letter is outside of valid range of "A" and "J".
-    if (letter.charCodeAt(0) < 65 || letter.charCodeAt(0) > 74) {
-      return false;
-    }
-
-    // Checks if number is outside of valid range of 1 and 10.
-    if (number < 1 || number > 10) {
-      return false;
-    }
-
-    // Checks if posArr is currently taken.
-    for (var i = 0; i < shipLocations1D.length; i++) {
-      if (areArraysEqual(posArr, shipLocations1D[i])) {
-        return false;
-      }
-    }
-
-    // Position is valid.
-    return true;
-  };
-
-  // Returns array of a position with the given position moved right.
-  const moveRight = (cellArr) => {
-    var letter = cellArr[0];
-    var number = cellArr[1];
-
-    letter = String.fromCharCode(letter.charCodeAt(0) + 1);
-    number = parseInt(number);
-
-    return [letter, number];
-  };
-
-  // Returns array of a position with the given position moved down.
-  const moveDown = (cellArr) => {
-    var letter = cellArr[0];
-    var number = cellArr[1];
-
-    letter = letter;
-    number = parseInt(number + 1);
-
-    return [letter, number];
-  };
-
-  // Initialize location array, positionFound boolean.
-  // Flattens all currently placed ship locations to 1D array of positions.
-  var location = [];
-  var positionFound = false;
-  var shipLocations1D = Object.values(shipLocations).flat();
-
-  // Repeats until a valid ship location is found.
-  while (!positionFound) {
-    // Reset location array.
-    location = [];
-
-    // Randomly get a valid current starting position.
-    var validStart = false;
-    var currPos = getRandomPosition();
-    while (!validStart) {
-      if (!isSpotValidandOnBoard(currPos)) {
-        currPos = getRandomPosition();
-      } else {
-        validStart = true;
-      }
-    }
-
-    // Push current position to location array.
-    location.push(currPos);
-
-    // Get random direction to move in as a boolean.
-    var horizontal = Math.random() < 0.5;
-
-    // Get remaining positions. Starts after the first position.
-    for (var i = 1; i < shipLength; i++) {
-      // Moving horizontally.
-      if (horizontal) {
-        currPos = moveRight(currPos);
-      }
-      // Moving vertically.
-      else {
-        currPos = moveDown(currPos);
-      }
-
-      // Exits for loop if position is not valid.
-      // While loop is restarted with new starting position.
-      if (!isSpotValidandOnBoard(currPos)) {
-        break;
-      }
-
-      // Adds currPos to location array.
-      location.push(currPos);
-
-      // If length of array reaches the length of the ship, position found, exit while loop.
-      if (location.length === shipLength) {
-        positionFound = true;
-      }
-    }
-  }
-
-  return location;
-};
-
 // Reveals the enemy ships.
 const revealEnemyShips = () => {
   var enemy;
@@ -755,20 +570,9 @@ const revealEnemyShips = () => {
   allShipLocations = allShipLocations.flat();
 
   for (var i = 0; i < allShipLocations.length; i++) {
-    var cell = getComputerCellFromArray(allShipLocations[i]);
+    var cell = compFuncs.getComputerCellFromArray(allShipLocations[i]);
     cell.classList.add("ship");
   }
-};
-
-// Returns the cell element on the Computer's board given an array position.
-const getComputerCellFromArray = (posArr) => {
-  var letter = String(posArr[0]);
-  var number = String(posArr[1]);
-  var queryString = `#player2-board > .cell[data-letter="${letter}"][data-number="${number}"]`;
-
-  var cell = document.querySelector(queryString);
-
-  return cell;
 };
 
 // Placing ships for player1 and player2 on the board.
@@ -805,4 +609,12 @@ const rotate = () => {
   pickShipLocations();
 };
 
-export { rotate, pickShipLocations, resetGame };
+export {
+  rotate,
+  pickShipLocations,
+  resetGame,
+  highlightShips,
+  selectedShipLocation,
+  getRandomPosition,
+  areArraysEqual,
+};
