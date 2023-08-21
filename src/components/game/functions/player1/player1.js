@@ -3,8 +3,9 @@ import { highlightShips, selectedShipLocation } from "../game";
 // Gets player1's cell with the given array.
 // Array is a letter and number.
 const getPlayer1CellElementFromArray = (posArr) => {
-  var letter = posArr[0];
-  var number = posArr[1];
+  // Query requires string elements.
+  var letter = String(posArr[0]);
+  var number = String(posArr[1]);
 
   var queryString = `#player1-board > .cell.playable-cell[data-letter="${letter}"][data-number="${number}"]`;
 
@@ -60,10 +61,77 @@ const setAllPlayer1CellsToDefaultClasses = () => {
   });
 };
 
+// Given an array of a position,
+// Returns an array of the position to the right.
+const getRightCellArray = (pos) => {
+  var letter = pos[0];
+  var number = pos[1];
+  var newLetter = String.fromCharCode(letter.charCodeAt(0) + 1);
+  var newPos = [newLetter, number];
+
+  return newPos;
+};
+
+// Given an array of a position,
+// Returns an array of the position to the left.
+const getLeftCellArray = (pos) => {
+  var letter = pos[0];
+  var number = pos[1];
+  var newLetter = String.fromCharCode(letter.charCodeAt(0) - 1);
+  var newPos = [newLetter, number];
+
+  return newPos;
+};
+
+// Given an array of a position,
+// Returns an array of the position to the below.
+const getBelowCellArray = (pos) => {
+  var letter = pos[0];
+  var number = pos[1];
+  var newNumber = parseInt(number) + 1;
+  var newPos = [letter, newNumber];
+
+  return newPos;
+};
+
+// Given an array of a position,
+// Returns an array of the position to the above.
+const getAboveCellArray = (pos) => {
+  var letter = pos[0];
+  var number = pos[1];
+  var newNumber = parseInt(number) - 1;
+  var newPos = [letter, newNumber];
+
+  return newPos;
+};
+
+// Given an array of a cell's position,
+// Returns true if the cell is on the board and has not been picked.
+const isCellOnBoardAndNotPicked = (pos) => {
+  var cellElement = getPlayer1CellElementFromArray(pos);
+
+  // Not on board.
+  if (cellElement === null) {
+    return false;
+  }
+
+  // Already picked.
+  if (!cellElement.classList.contains("playable-cell")) {
+    return false;
+  }
+
+  return true;
+};
+
 export {
   getPlayer1CellElementFromArray,
   getPlayer1RightCellElement,
   getPlayer1BelowCellElement,
   removeAllPlayer1CellEventListeners,
   setAllPlayer1CellsToDefaultClasses,
+  getRightCellArray,
+  getLeftCellArray,
+  getBelowCellArray,
+  getAboveCellArray,
+  isCellOnBoardAndNotPicked,
 };
