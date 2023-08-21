@@ -1,4 +1,5 @@
 import { getRandomPosition, areArraysEqual } from "../game";
+import * as player1Funcs from "../player1/player1";
 
 // Returns the cell element on the Computer's board given an array position.
 const getComputerCellFromArray = (posArr) => {
@@ -147,4 +148,341 @@ const getSingleComputerShipLocation = (shipLength, shipLocations) => {
   return location;
 };
 
-export { getComputerCellFromArray, placeRandomComputerShips };
+// Returns an array for a random location that has not been picked yet for the computer player.
+const getRandomComputerAttack = (enemyPlayer) => {
+  var hitAttacks = enemyPlayer.board.hitAttacks;
+  var missedAttacks = enemyPlayer.board.missedAttacks;
+  var takenSpots = hitAttacks.concat(missedAttacks);
+
+  var pos = getRandomPosition();
+  var validSpot = false;
+  while (!validSpot) {
+    // Get new pos
+    var pos = getRandomPosition();
+
+    // Checks if pos is currently taken.
+    for (var i = 0; i <= takenSpots.length; i++) {
+      // Exit loop if pos is taken.
+      if (areArraysEqual(pos, takenSpots[i])) {
+        break;
+      }
+
+      if (i === takenSpots.length) {
+        validSpot = true;
+        break;
+      }
+    }
+  }
+
+  return pos;
+};
+
+// Gets a more realistic guess for the computer player.
+const getRealisticComputerAttack = (difficultyOptions, enemyPlayer) => {
+  // Helper function.
+  // Using the last hit cell, gets a valid non-picked surrounding cell.
+  // Order: Right, Below, Left, Above
+  const getCurrValidSurroundingGuess = () => {
+    // Get last hit in array.
+    var lastHit =
+      difficultyOptions.prevHits[difficultyOptions.prevHits.length - 1];
+
+    var currCell;
+    // Get right cell if valid and not previously picked
+    if (!difficultyOptions.guessRight) {
+      currCell = player1Funcs.getRightCellArray(lastHit);
+      difficultyOptions.huntDirection = "RIGHT";
+
+      if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
+        // Go to next surrounding cell
+        difficultyOptions.guessRight = true;
+      }
+    }
+
+    // Get below cell if valid and not previously picked
+    if (difficultyOptions.guessRight && !difficultyOptions.guessBelow) {
+      currCell = player1Funcs.getBelowCellArray(lastHit);
+      difficultyOptions.huntDirection = "BELOW";
+
+      if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
+        // Go to next surrounding cell
+        difficultyOptions.guessBelow = true;
+      }
+    }
+
+    // Get left cell if valid and not previously picked
+    if (
+      difficultyOptions.guessRight &&
+      difficultyOptions.guessBelow &&
+      !difficultyOptions.guessLeft
+    ) {
+      currCell = player1Funcs.getLeftCellArray(lastHit);
+      difficultyOptions.huntDirection = "LEFT";
+
+      if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
+        // Go to next surrounding cell
+        difficultyOptions.guessLeft = true;
+      }
+    }
+
+    // Get above cell if valid and not previously picked
+    if (
+      difficultyOptions.guessRight &&
+      difficultyOptions.guessBelow &&
+      difficultyOptions.guessLeft &&
+      !difficultyOptions.guessAbove
+    ) {
+      currCell = player1Funcs.getAboveCellArray(lastHit);
+      difficultyOptions.huntDirection = "ABOVE";
+
+      if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
+        // No more valid surrounding cells.
+        // Set to null.
+        currCell = null;
+        difficultyOptions.guessAbove = true;
+      }
+    }
+
+    // Set currently used direction to the next.
+    switchToNextSurroundingDirection();
+
+    // If there is no valid cell around prevHits[prevHits.length - 1]
+    // Then remove the last hit in prevHits
+    // And attempt surrounding cells again of new last hit.
+    if (
+      currCell === null &&
+      difficultyOptions.guessRight &&
+      difficultyOptions.guessBelow &&
+      difficultyOptions.guessLeft &&
+      difficultyOptions.guessAbove
+    ) {
+      difficultyOptions.prevHits.pop();
+      // difficultyOptions.huntDirection = "RIGHT";
+      difficultyOptions.huntDirection = "";
+
+      difficultyOptions.guessRight = false;
+      difficultyOptions.guessBelow = false;
+      difficultyOptions.guessLeft = false;
+      difficultyOptions.guessAbove = false;
+
+      currCell = getCurrValidSurroundingGuess();
+    }
+
+    return currCell;
+  };
+
+  // Helper function gets a cell based on the direction of the last cell hit.
+  const getGuessInDirection = () => {
+    // Get last cell hit
+    var currCell =
+      difficultyOptions.prevHits[difficultyOptions.prevHits.length - 1];
+
+    // Goes in a single direction until an available cell is reached.
+    // If cell was hit, skips over it.
+    switch (difficultyOptions.huntDirection) {
+      case "RIGHT":
+        currCell = player1Funcs.getRightCellArray(currCell);
+        // Reversed direction
+        if (difficultyOptions.isHuntDirectionReversed) {
+          var validCell = false;
+
+          while (!validCell) {
+            if (player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
+              validCell = true;
+            } else {
+              currCell = player1Funcs.getRightCellArray(currCell);
+            }
+          }
+        } else {
+          if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
+            currCell = null;
+          }
+        }
+        break;
+      case "BELOW":
+        currCell = player1Funcs.getBelowCellArray(currCell);
+        // Reversed direction
+        if (difficultyOptions.isHuntDirectionReversed) {
+          var validCell = false;
+
+          while (!validCell) {
+            if (player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
+              validCell = true;
+            } else {
+              currCell = player1Funcs.getBelowCellArray(currCell);
+            }
+          }
+        } else {
+          if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
+            currCell = null;
+          }
+        }
+        break;
+      case "LEFT":
+        currCell = player1Funcs.getLeftCellArray(currCell);
+        // Reversed direction
+        if (difficultyOptions.isHuntDirectionReversed) {
+          var validCell = false;
+
+          while (!validCell) {
+            if (player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
+              validCell = true;
+            } else {
+              currCell = player1Funcs.getLeftCellArray(currCell);
+            }
+          }
+        } else {
+          if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
+            currCell = null;
+          }
+        }
+        break;
+      case "ABOVE":
+        currCell = player1Funcs.getAboveCellArray(currCell);
+        // Reversed direction
+        if (difficultyOptions.isHuntDirectionReversed) {
+          var validCell = false;
+
+          while (!validCell) {
+            if (player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
+              validCell = true;
+            } else {
+              currCell = player1Funcs.getAboveCellArray(currCell);
+            }
+          }
+        } else {
+          if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
+            currCell = null;
+          }
+        }
+        break;
+    }
+
+    // Cell was not valid.
+    // Reverse huntDirection and restart getGuessInDirection()
+    if (currCell === null) {
+      reverseHuntDirection();
+
+      // Guess will be retrieved via recursion.
+      currCell = getGuessInDirection();
+    }
+
+    return currCell;
+  };
+
+  // Set currently used direction to the next.
+  // Right => Below => Left => Above
+  const switchToNextSurroundingDirection = () => {
+    if (!difficultyOptions.guessRight) {
+      difficultyOptions.guessRight = true;
+    } else if (difficultyOptions.guessRight && !difficultyOptions.guessBelow) {
+      difficultyOptions.guessBelow = true;
+    } else if (
+      difficultyOptions.guessRight &&
+      difficultyOptions.guessBelow &&
+      !difficultyOptions.guessLeft
+    ) {
+      difficultyOptions.guessLeft = true;
+    } else if (
+      difficultyOptions.guessRight &&
+      difficultyOptions.guessBelow &&
+      difficultyOptions.guessLeft &&
+      !difficultyOptions.guessAbove
+    ) {
+      difficultyOptions.guessAbove = true;
+    }
+  };
+
+  // Reverses huntDirection
+  const reverseHuntDirection = () => {
+    switch (difficultyOptions.huntDirection) {
+      case "RIGHT":
+        difficultyOptions.huntDirection = "LEFT";
+        break;
+      case "BELOW":
+        difficultyOptions.huntDirection = "ABOVE";
+        break;
+      case "LEFT":
+        difficultyOptions.huntDirection = "RIGHT";
+        break;
+      case "ABOVE":
+        difficultyOptions.huntDirection = "BELOW";
+        break;
+    }
+  };
+
+  var guess;
+
+  // Random guessing
+  if (!difficultyOptions.huntMode) {
+    guess = getRandomComputerAttack(enemyPlayer);
+  }
+  // Hunt mode is first activated
+  else if (
+    difficultyOptions.huntMode &&
+    difficultyOptions.isLastAttackHit &&
+    difficultyOptions.prevHits.length === 1
+  ) {
+    guess = getCurrValidSurroundingGuess();
+  }
+  // Hunt mode active, last guess was miss, prevHits is non empty, not using huntDirection.
+  else if (
+    difficultyOptions.huntMode &&
+    !difficultyOptions.isLastAttackHit &&
+    difficultyOptions.prevHits.length !== 0 &&
+    difficultyOptions.huntDirection === ""
+  ) {
+    difficultyOptions.guessRight = false;
+    difficultyOptions.guessBelow = false;
+    difficultyOptions.guessLeft = false;
+    difficultyOptions.guessAbove = false;
+    guess = getCurrValidSurroundingGuess();
+  }
+  // Hunt mode active, going in a reverse direction, missed last attak
+  // Reset and go back to surrounding guesses
+  else if (
+    difficultyOptions.huntMode &&
+    difficultyOptions.huntDirection !== "" &&
+    !difficultyOptions.isLastAttackHit &&
+    difficultyOptions.isHuntDirectionReversed
+  ) {
+    difficultyOptions.isHuntDirectionReversed = false;
+    difficultyOptions.huntDirection = "";
+
+    difficultyOptions.guessRight = false;
+    difficultyOptions.guessBelow = false;
+    difficultyOptions.guessLeft = false;
+    difficultyOptions.guessAbove = false;
+    guess = getCurrValidSurroundingGuess();
+  }
+  // Hunt mode active, last guess was miss, reverse huntDirection
+  else if (
+    difficultyOptions.huntMode &&
+    !difficultyOptions.isLastAttackHit &&
+    difficultyOptions.huntDirection !== ""
+  ) {
+    difficultyOptions.isHuntDirectionReversed = true;
+
+    reverseHuntDirection();
+
+    guess = getGuessInDirection();
+  }
+
+  // Hunt mode has been active, last guess was hit
+  else if (
+    difficultyOptions.huntMode &&
+    difficultyOptions.isLastAttackHit &&
+    difficultyOptions.prevHits.length !== 0
+  ) {
+    guess = getGuessInDirection();
+  }
+
+  return guess;
+};
+
+export {
+  getComputerCellFromArray,
+  placeRandomComputerShips,
+  getRandomComputerAttack,
+  getRealisticComputerAttack,
+};

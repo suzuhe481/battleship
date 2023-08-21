@@ -32,16 +32,29 @@ var isFirstCompGuess = true;
 var firstGuess = ["E", 5];
 
 // Variables for realistic difficulty
-var realisticDifficlty = true;
-var huntMode = false;
-var prevHits = [];
-var huntDirection = "";
-var isHuntDirectionReversed = false;
-var isLastAttackHit = false;
-var guessRight = false;
-var guessBelow = false;
-var guessLeft = false;
-var guessAbove = false;
+var difficultyOptions = {
+  realisticDifficlty: true,
+  huntMode: false,
+  prevHits: [],
+  huntDirection: "",
+  isHuntDirectionReversed: false,
+  isLastAttackHit: false,
+  guessRight: false,
+  guessBelow: false,
+  guessLeft: false,
+  guessAbove: false,
+};
+
+// var realisticDifficlty = true;
+// var huntMode = false;
+// var prevHits = [];
+// var huntDirection = "";
+// var isHuntDirectionReversed = false;
+// var isLastAttackHit = false;
+// var guessRight = false;
+// var guessBelow = false;
+// var guessLeft = false;
+// var guessAbove = false;
 
 // Allows the enemy board to be clicked.
 const enableEnemyBoard = () => {
@@ -63,8 +76,11 @@ const enableEnemyBoard = () => {
   }
   // Computer turn - Have computer attack
   else {
-    if (realisticDifficlty) {
-      var computerAttack = getRealisticComputerAttack();
+    if (difficultyOptions.realisticDifficlty) {
+      var computerAttack = compFuncs.getRealisticComputerAttack(
+        difficultyOptions,
+        enemyPlayer
+      );
       // Debug if statement
       if (isFirstCompGuess) {
         computerAttack = firstGuess;
@@ -72,7 +88,7 @@ const enableEnemyBoard = () => {
       }
       runAttack(computerAttack);
     } else {
-      var computerAttack = getRandomComputerAttack();
+      var computerAttack = compFuncs.getRandomComputerAttack(enemyPlayer);
       runAttack(computerAttack);
     }
   }
@@ -132,7 +148,7 @@ const runAttack = (event) => {
 
     // Adjusting variables for realistic difficulty
     if (currPlayer.name === "Computer") {
-      isLastAttackHit = false;
+      difficultyOptions.isLastAttackHit = false;
     }
 
     var missIcon = CreateMissIcon();
@@ -145,9 +161,9 @@ const runAttack = (event) => {
 
     // Adjusting variables for realistic difficulty
     if (currPlayer.name === "Computer") {
-      huntMode = true;
-      isLastAttackHit = true;
-      prevHits.push(coordinates);
+      difficultyOptions.huntMode = true;
+      difficultyOptions.isLastAttackHit = true;
+      difficultyOptions.prevHits.push(coordinates);
     }
 
     var hitIcon = CreateHitIcon();
@@ -160,22 +176,21 @@ const runAttack = (event) => {
 
       // Adjusting variables for realistic difficulty
       if (currPlayer.name === "Computer") {
-        // huntDirection = "RIGHT";
-        huntDirection = "";
-        guessRight = false;
-        guessBelow = false;
-        guessLeft = false;
-        guessAbove = false;
+        difficultyOptions.huntDirection = "";
+        difficultyOptions.guessRight = false;
+        difficultyOptions.guessBelow = false;
+        difficultyOptions.guessLeft = false;
+        difficultyOptions.guessAbove = false;
         // isLastAttackHit is set to false to search surrounding cells
         // from the last previous hit before sinking the ship.
-        isLastAttackHit = false;
+        difficultyOptions.isLastAttackHit = false;
 
         // Remove sunk ship's locations from prevHits
         removeSunkShipFromPrevHits(results);
 
         // If prevHits array is empty
-        if (prevHits.length === 0) {
-          huntMode = false;
+        if (difficultyOptions.prevHits.length === 0) {
+          difficultyOptions.huntMode = false;
         }
       }
     }
@@ -565,343 +580,6 @@ const getCellNumberAsInt = (cell) => {
   return parseInt(cell.dataset.number);
 };
 
-// Returns an array for a random location that has not been picked yet for the computer player.
-const getRandomComputerAttack = () => {
-  var hitAttacks = enemyPlayer.board.hitAttacks;
-  var missedAttacks = enemyPlayer.board.missedAttacks;
-  var takenSpots = hitAttacks.concat(missedAttacks);
-
-  var pos = getRandomPosition();
-  var validSpot = false;
-  while (!validSpot) {
-    // Get new pos
-    var pos = getRandomPosition();
-
-    // Checks if pos is currently taken.
-    for (var i = 0; i <= takenSpots.length; i++) {
-      // Exit loop if pos is taken.
-      if (areArraysEqual(pos, takenSpots[i])) {
-        break;
-      }
-
-      if (i === takenSpots.length) {
-        validSpot = true;
-        break;
-      }
-    }
-  }
-
-  return pos;
-};
-
-// Gets a more realistic guess for the computer player.
-const getRealisticComputerAttack = () => {
-  // Helper function.
-  // Using the last hit cell, gets a valid surrounding cell.
-  // Order: Right, Below, Left, Above
-  const getCurrValidSurroundingGuess = () => {
-    // Get last hit in array.
-    var lastHit = prevHits[prevHits.length - 1];
-
-    var currCell;
-    // Get right cell if valid and not previously picked
-    if (!guessRight) {
-      currCell = player1Funcs.getRightCellArray(lastHit);
-      huntDirection = "RIGHT";
-
-      if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-        // Go to next surrounding cell
-        guessRight = true;
-      }
-    }
-
-    // Get below cell if valid and not previously picked
-    if (guessRight && !guessBelow) {
-      currCell = player1Funcs.getBelowCellArray(lastHit);
-      huntDirection = "BELOW";
-
-      if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-        // Go to next surrounding cell
-        guessBelow = true;
-      }
-    }
-
-    // Get left cell if valid and not previously picked
-    if (guessRight && guessBelow && !guessLeft) {
-      currCell = player1Funcs.getLeftCellArray(lastHit);
-      huntDirection = "LEFT";
-
-      if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-        // Go to next surrounding cell
-        guessLeft = true;
-      }
-    }
-
-    // Get above cell if valid and not previously picked
-    if (guessRight && guessBelow && guessLeft && !guessAbove) {
-      currCell = player1Funcs.getAboveCellArray(lastHit);
-      huntDirection = "ABOVE";
-
-      if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-        // No more valid surrounding cells.
-        // Set to null.
-        currCell = null;
-        guessAbove = true;
-      }
-    }
-
-    // Set currently used direction to the next.
-    if (!guessRight) {
-      guessRight = true;
-    } else if (guessRight && !guessBelow) {
-      guessBelow = true;
-    } else if (guessRight && guessBelow && !guessLeft) {
-      guessLeft = true;
-    } else if (guessRight && guessBelow && guessLeft && !guessAbove) {
-      guessAbove = true;
-    }
-
-    // If there is no valid cell around prevHits[prevHits.length - 1]
-    // Then remove the last hit in prevHits
-    // And attempt surrounding cells again of new last hit.
-    if (
-      currCell === null &&
-      guessRight &&
-      guessBelow &&
-      guessLeft &&
-      guessAbove
-    ) {
-      prevHits.pop();
-      huntDirection = "RIGHT";
-      guessRight = false;
-      guessBelow = false;
-      guessLeft = false;
-      guessAbove = false;
-      currCell = getCurrValidSurroundingGuess();
-    }
-
-    return currCell;
-  };
-
-  // Helper function gets a cell based on the direction of the last cell hit.
-  const getGuessInDirection = () => {
-    // Get last cell hit
-    var currCell = prevHits[prevHits.length - 1];
-
-    switch (huntDirection) {
-      case "RIGHT":
-        currCell = player1Funcs.getRightCellArray(currCell);
-        if (isHuntDirectionReversed) {
-          // Get next pickable cell. If hit, skip
-          var validCell = false;
-
-          while (!validCell) {
-            if (player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-              validCell = true;
-              // break;
-            } else {
-              currCell = player1Funcs.getRightCellArray(currCell);
-            }
-          }
-        } else {
-          if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-            currCell = null;
-          }
-          // break;
-        }
-        break;
-      case "BELOW":
-        currCell = player1Funcs.getBelowCellArray(currCell);
-        if (isHuntDirectionReversed) {
-          // Get next pickable cell. If hit, skip
-          var validCell = false;
-
-          while (!validCell) {
-            if (player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-              validCell = true;
-              // break;
-            } else {
-              currCell = player1Funcs.getBelowCellArray(currCell);
-            }
-          }
-        } else {
-          if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-            currCell = null;
-          }
-          // break;
-        }
-        break;
-      case "LEFT":
-        currCell = player1Funcs.getLeftCellArray(currCell);
-        if (isHuntDirectionReversed) {
-          // Get next pickable cell. If hit, skip
-          var validCell = false;
-
-          while (!validCell) {
-            if (player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-              validCell = true;
-              // break;
-            } else {
-              currCell = player1Funcs.getLeftCellArray(currCell);
-            }
-          }
-        } else {
-          if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-            currCell = null;
-          }
-          // break;
-        }
-        break;
-
-      // currCell = player1Funcs.getLeftCellArray(currCell);
-      // if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-      //   currCell = null;
-      // }
-      // break;
-      case "ABOVE":
-        currCell = player1Funcs.getAboveCellArray(currCell);
-        if (isHuntDirectionReversed) {
-          // Get next pickable cell. If hit, skip
-          var validCell = false;
-
-          while (!validCell) {
-            if (player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-              validCell = true;
-              // break;
-            } else {
-              currCell = player1Funcs.getAboveCellArray(currCell);
-            }
-          }
-        } else {
-          if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-            currCell = null;
-          }
-          // break;
-        }
-        break;
-      // currCell = player1Funcs.getAboveCellArray(currCell);
-      // if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
-      //   currCell = null;
-      // }
-      // break;
-    }
-
-    // If there is no valid cell around prevHits[prevHits.length - 1]
-    // Then remove the last hit in prevHits
-    // And attempt surrounding cells again of new last hit.
-
-    // Cell was not valid.
-    // Reverse huntDirection and restart getGuessInDirection()
-    if (
-      currCell === null
-      // &&
-      // guessRight &&
-      // guessBelow &&
-      // guessLeft &&
-      // guessAbove
-    ) {
-      // Reverses huntDirection
-      switch (huntDirection) {
-        case "RIGHT":
-          huntDirection = "LEFT";
-          break;
-        case "BELOW":
-          huntDirection = "ABOVE";
-          break;
-        case "LEFT":
-          huntDirection = "RIGHT";
-          break;
-        case "ABOVE":
-          huntDirection = "BELOW";
-          break;
-      }
-
-      currCell = getGuessInDirection();
-
-      // prevHits.pop();
-      // huntDirection = "RIGHT";
-      // huntDirection = "";
-      // guessRight = false;
-      // guessBelow = false;
-      // guessLeft = false;
-      // guessAbove = false;
-      // currCell = getCurrValidSurroundingGuess();
-    }
-
-    return currCell;
-  };
-
-  var guess;
-
-  // Random guessing
-  if (!huntMode) {
-    guess = getRandomComputerAttack();
-  }
-  // Hunt mode is first activated
-  else if (huntMode && isLastAttackHit && prevHits.length === 1) {
-    guess = getCurrValidSurroundingGuess();
-  }
-  // Hunt mode active, last guess was miss, prevHits is non empty, not using huntDirection.
-  else if (
-    huntMode &&
-    !isLastAttackHit &&
-    prevHits.length !== 0 &&
-    huntDirection === ""
-  ) {
-    guessRight = false;
-    guessBelow = false;
-    guessLeft = false;
-    guessAbove = false;
-    guess = getCurrValidSurroundingGuess();
-  }
-  // Hunt mode active, going in a reverse direction, missed last attak
-  // Reset and go back to surrounding guesses
-  else if (
-    huntMode &&
-    huntDirection !== "" &&
-    !isLastAttackHit &&
-    isHuntDirectionReversed
-  ) {
-    isHuntDirectionReversed = false;
-    huntDirection = "";
-
-    guessRight = false;
-    guessBelow = false;
-    guessLeft = false;
-    guessAbove = false;
-    guess = getCurrValidSurroundingGuess();
-  }
-  // Hunt mode active, last guess was miss, reverse huntDirection
-  else if (huntMode && !isLastAttackHit && huntDirection !== "") {
-    isHuntDirectionReversed = true;
-
-    // Reverses huntDirection
-    switch (huntDirection) {
-      case "RIGHT":
-        huntDirection = "LEFT";
-        break;
-      case "BELOW":
-        huntDirection = "ABOVE";
-        break;
-      case "LEFT":
-        huntDirection = "RIGHT";
-        break;
-      case "ABOVE":
-        huntDirection = "BELOW";
-        break;
-    }
-
-    guess = getGuessInDirection();
-  }
-
-  // Hunt mode has been active, last guess was hit
-  else if (huntMode && isLastAttackHit && prevHits.length !== 0) {
-    guess = getGuessInDirection();
-  }
-
-  return guess;
-};
-
 // Given the results of the sunk ship,
 // Removes the sunk ship's location from the prevHits array.
 const removeSunkShipFromPrevHits = (results) => {
@@ -909,18 +587,17 @@ const removeSunkShipFromPrevHits = (results) => {
 
   var newPrevHits = [];
 
-  for (var i = 0; i < prevHits.length; i++) {
+  for (var i = 0; i < difficultyOptions.prevHits.length; i++) {
     for (var j = 0; j < shipLocation.length; j++) {
-      // console.log("Compare prevHit", prevHits[i], " and shipLocation", shipLocation[j]);
-      if (areArraysEqual(prevHits[i], shipLocation[j])) {
+      if (areArraysEqual(difficultyOptions.prevHits[i], shipLocation[j])) {
         break;
       } else if (j === shipLocation.length - 1) {
-        newPrevHits.push(prevHits[i]);
+        newPrevHits.push(difficultyOptions.prevHits[i]);
       }
     }
   }
 
-  prevHits = newPrevHits;
+  difficultyOptions.prevHits = newPrevHits;
 };
 
 // Returns an array with a position on the board.
