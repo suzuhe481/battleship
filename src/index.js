@@ -1,5 +1,6 @@
 import gameTitle from "./components/gameTitle/gameTitle";
 import startGameButton from "./components/startGameButton/startGameButton";
+import pickDifficultyButtons from "./components/difficultyButtons/pickDifficultyButtons";
 import rotateShipButton from "./components/rotateShipButton/rotateShipButton";
 import playAgainButton from "./components/playAgainButton/playAgainButton";
 import GameBoards from "./components/gameBoard/UI/gameBoards";
@@ -24,6 +25,7 @@ document.body.appendChild(gameMessageContainer);
 const gameButtonContainer = document.createElement("div");
 gameButtonContainer.id = "game-button-container";
 gameButtonContainer.appendChild(startGameButton());
+gameButtonContainer.appendChild(pickDifficultyButtons());
 gameButtonContainer.appendChild(rotateShipButton());
 gameButtonContainer.appendChild(playAgainButton());
 document.body.appendChild(gameButtonContainer);
