@@ -7,12 +7,9 @@ const startTheGame = () => {
   const button = document.getElementById("start-game-button");
   button.style.display = "none";
 
-  // Displays the Rotate Ship button
-  const rotateButton = document.getElementById("rotate-ship-button");
-  rotateButton.style.display = "block";
-
-  // First step of game. Let player1 pick ship locations.
-  pickShipLocations();
+  // Display the difficulty buttons
+  const difficultyButtons = document.getElementById("difficulty-container");
+  difficultyButtons.style.display = "block";
 };
 
 const startGameButton = () => {
