@@ -231,9 +231,6 @@ const gameWon = () => {
 
   revealEnemyShips();
 
-  var turnStatus = document.getElementById("game-turn-status");
-  turnStatus.style.display = "none";
-
   setGameTurnStatus(`${currPlayer.name} Wins!`);
 
   var resetButton = document.getElementById("play-again-button");
@@ -270,11 +267,6 @@ const resetGame = () => {
   // Resets rotate direction to horizontal.
   horizontal = true;
 
-  // Displays rotate button.
-  var rotateButton = document.getElementById("rotate-ship-button");
-  rotateButton.style.display = "block";
-  rotateButton.innerHTML = "Rotate Ship - Horizontal";
-
   // Creates new game boards
   var gameBoardsContainer = document.getElementById("gameboards-container");
   gameBoardsContainer.innerHTML = "";
@@ -284,12 +276,18 @@ const resetGame = () => {
   currentShipPlacement = "carrier";
   currentShipLength = 5;
 
-  pickShipLocations();
+  // pickShipLocations();
 };
 
 // Enables picking a location of a ship for player 1.
 // The ship being placed is determined by currentShipPlacement.
-const pickShipLocations = () => {
+const pickShipLocations = (difficulty) => {
+  if (difficulty === "EASY") {
+    difficultyOptions.realisticDifficlty = false;
+  } else if (difficulty === "REALISTIC") {
+    difficultyOptions.realisticDifficlty = true;
+  }
+
   setGameMessage(`Place your ${currentShipPlacement}`);
 
   switch (currentShipPlacement) {
