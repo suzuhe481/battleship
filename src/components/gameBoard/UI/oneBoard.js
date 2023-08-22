@@ -6,7 +6,16 @@ const numToLetter = (num) => {
   return String.fromCharCode(num + 64);
 };
 
-const OneBoard = () => {
+const OneBoard = (playerName) => {
+  const boardContainer = document.createElement("div");
+  boardContainer.classList.add("board-container");
+
+  const playerTitle = document.createElement("div");
+  playerTitle.classList.add("player-title");
+  playerTitle.innerHTML = playerName;
+
+  boardContainer.appendChild(playerTitle);
+
   const board = document.createElement("div");
   board.classList.add("board");
 
@@ -34,7 +43,9 @@ const OneBoard = () => {
     }
   }
 
-  return board;
+  boardContainer.appendChild(board);
+
+  return boardContainer;
 };
 
 export default OneBoard;
