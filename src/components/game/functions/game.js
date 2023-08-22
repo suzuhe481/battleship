@@ -21,15 +21,18 @@ var currentShipLength = 5;
 var player1Ships = {};
 var player2Ships = {};
 
-// Debug
-const timeBetweenTurns = 200; // 1000
-const timeAddedOnShipDestroyed = 200; // 1000
+const timeBetweenTurns = 1000; // 1000
+const timeAddedOnShipDestroyed = 1000; // 1000
+
+// Debug variables for less time between turns
+// const timeBetweenTurns = 200;
+// const timeAddedOnShipDestroyed = 200;
 
 // Debug
 // Place ships vertically starting at [C, 3] and
 // go right for this test
-var isFirstCompGuess = true;
-var firstGuess = ["E", 5];
+// var isFirstCompGuess = true;
+// var firstGuess = ["E", 5];
 
 // Variables for realistic difficulty
 var difficultyOptions = {
@@ -82,10 +85,10 @@ const enableEnemyBoard = () => {
         enemyPlayer
       );
       // Debug if statement
-      if (isFirstCompGuess) {
-        computerAttack = firstGuess;
-        isFirstCompGuess = false;
-      }
+      // if (isFirstCompGuess) {
+      //   computerAttack = firstGuess;
+      //   isFirstCompGuess = false;
+      // }
       runAttack(computerAttack);
     } else {
       var computerAttack = compFuncs.getRandomComputerAttack(enemyPlayer);
@@ -560,7 +563,7 @@ const storeShipAndSwitchOrStartGame = (shipLocation) => {
       player2Ships = compFuncs.placeRandomComputerShips();
 
       // Debug
-      console.log(player2Ships);
+      // console.log(player2Ships);
 
       placeShips(player1Ships, player2Ships);
 
