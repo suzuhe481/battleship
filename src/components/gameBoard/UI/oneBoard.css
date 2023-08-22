@@ -9,3 +9,10 @@
   grid-template-columns: repeat(11, 1fr);
   grid-template-rows: repeat(11, 1fr);
 }
+
+.player-title {
+  text-align: center;
+  font-size: 1.2rem;
+
+  padding: 10px 0;
+}
