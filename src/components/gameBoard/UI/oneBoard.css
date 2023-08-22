@@ -1,8 +1,8 @@
 .board {
   display: grid;
 
-  height: 350px;
-  width: 350px;
+  height: 45vw;
+  width: 45vw;
 
   border: 2px solid black;
 
