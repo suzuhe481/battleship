@@ -7,7 +7,7 @@ const getPlayer1CellElementFromArray = (posArr) => {
   var letter = String(posArr[0]);
   var number = String(posArr[1]);
 
-  var queryString = `#player1-board > .cell.playable-cell[data-letter="${letter}"][data-number="${number}"]`;
+  var queryString = `#player1-board > .board > .cell.playable-cell[data-letter="${letter}"][data-number="${number}"]`;
 
   var cell = document.querySelector(queryString);
 
@@ -40,7 +40,7 @@ const getPlayer1BelowCellElement = (currCell) => {
 
 // Removes every event listener for every cell in player 1's board.
 const removeAllPlayer1CellEventListeners = () => {
-  var queryString = "#player1-board > .cell.playable-cell";
+  var queryString = "#player1-board > .board > .cell.playable-cell";
   var player1Cells = document.querySelectorAll(queryString);
 
   player1Cells.forEach((cell) => {
@@ -52,7 +52,7 @@ const removeAllPlayer1CellEventListeners = () => {
 
 // Resets Player 1's cells to default classes that do NOT have a ship placed on them.
 const setAllPlayer1CellsToDefaultClasses = () => {
-  var queryString = "#player1-board > .cell.playable-cell";
+  var queryString = "#player1-board > .board > .cell.playable-cell";
   var player1Cells = document.querySelectorAll(queryString);
 
   player1Cells.forEach((cell) => {

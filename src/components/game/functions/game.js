@@ -65,7 +65,7 @@ const enableEnemyBoard = () => {
 
   // Player 1 turn - Turn on enemy board.
   if (currPlayer.name === "Player 1") {
-    var p2Cells = "#player2-board > .cell.playable-cell";
+    var p2Cells = "#player2-board > .board > .cell.playable-cell";
     var playableCells = document.querySelectorAll(p2Cells);
 
     // "active" class enables color change on hover.
@@ -97,10 +97,10 @@ const enableEnemyBoard = () => {
 // Disables the enemy board from being clicked.
 const disableEnemyBoard = () => {
   if (enemyPlayer.name === "Player 1") {
-    var p1Cells = "#player1-board > .cell.playable-cell";
+    var p1Cells = "#player1-board > .board > .cell.playable-cell";
     var playableCells = document.querySelectorAll(p1Cells);
   } else {
-    var p2Cells = "#player2-board > .cell.playable-cell";
+    var p2Cells = "#player2-board > .board > .cell.playable-cell";
     var playableCells = document.querySelectorAll(p2Cells);
   }
 
@@ -372,7 +372,7 @@ const isSpaceOccupied = (cell) => {
 // First - All valid cell elements for horizontal placement.
 // Second - All invalid cell elements for horizontal placement.
 const getValidandInvalidHorizontalCells = () => {
-  var queryString = "#player1-board > .cell.playable-cell";
+  var queryString = "#player1-board > .board > .cell.playable-cell";
   var player1Cells = document.querySelectorAll(queryString);
 
   var validCells = [];
@@ -420,7 +420,7 @@ const getValidandInvalidHorizontalCells = () => {
 // First - All valid cell elements for vertical placement.
 // Second - All invalid cell elements for vertical placement.
 const getValidandInvalidVerticalCells = () => {
-  var queryString = "#player1-board > .cell.playable-cell";
+  var queryString = "#player1-board > .board > .cell.playable-cell";
   var player1Cells = document.querySelectorAll(queryString);
 
   var validCells = [];
