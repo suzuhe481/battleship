@@ -1,0 +1,22 @@
+#game-rules {
+  margin: auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+  width: 80vw;
+
+  font-size: 1.1rem;
+}
+
+#game-rules .description {
+  font-weight: bold;
+}
+
+#game-rules > ul {
+  list-style: disc;
+  list-style-position: inside;
+}
+
+#game-rules > ul > li {
+  margin: 5px 0;
+}
