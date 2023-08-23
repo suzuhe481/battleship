@@ -282,6 +282,7 @@ const getRealisticComputerAttack = (difficultyOptions, enemyPlayer) => {
     switch (difficultyOptions.huntDirection) {
       case "RIGHT":
         currCell = player1Funcs.getRightCellArray(currCell);
+
         // Reversed direction
         if (difficultyOptions.isHuntDirectionReversed) {
           var validCell = false;
@@ -292,6 +293,12 @@ const getRealisticComputerAttack = (difficultyOptions, enemyPlayer) => {
             } else {
               currCell = player1Funcs.getRightCellArray(currCell);
             }
+
+            // To exit while loop on out of bounds cell
+            if (!player1Funcs.isCellOnBoard(currCell)) {
+              currCell = null;
+              validCell = true;
+            }
           }
         } else {
           if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
@@ -301,6 +308,7 @@ const getRealisticComputerAttack = (difficultyOptions, enemyPlayer) => {
         break;
       case "BELOW":
         currCell = player1Funcs.getBelowCellArray(currCell);
+
         // Reversed direction
         if (difficultyOptions.isHuntDirectionReversed) {
           var validCell = false;
@@ -311,6 +319,12 @@ const getRealisticComputerAttack = (difficultyOptions, enemyPlayer) => {
             } else {
               currCell = player1Funcs.getBelowCellArray(currCell);
             }
+
+            // To exit while loop on out of bounds cell
+            if (!player1Funcs.isCellOnBoard(currCell)) {
+              currCell = null;
+              validCell = true;
+            }
           }
         } else {
           if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
@@ -320,6 +334,7 @@ const getRealisticComputerAttack = (difficultyOptions, enemyPlayer) => {
         break;
       case "LEFT":
         currCell = player1Funcs.getLeftCellArray(currCell);
+
         // Reversed direction
         if (difficultyOptions.isHuntDirectionReversed) {
           var validCell = false;
@@ -330,6 +345,12 @@ const getRealisticComputerAttack = (difficultyOptions, enemyPlayer) => {
             } else {
               currCell = player1Funcs.getLeftCellArray(currCell);
             }
+
+            // To exit while loop on out of bounds cell
+            if (!player1Funcs.isCellOnBoard(currCell)) {
+              currCell = null;
+              validCell = true;
+            }
           }
         } else {
           if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
@@ -339,6 +360,7 @@ const getRealisticComputerAttack = (difficultyOptions, enemyPlayer) => {
         break;
       case "ABOVE":
         currCell = player1Funcs.getAboveCellArray(currCell);
+
         // Reversed direction
         if (difficultyOptions.isHuntDirectionReversed) {
           var validCell = false;
@@ -349,6 +371,12 @@ const getRealisticComputerAttack = (difficultyOptions, enemyPlayer) => {
             } else {
               currCell = player1Funcs.getAboveCellArray(currCell);
             }
+
+            // To exit while loop on out of bounds cell
+            if (!player1Funcs.isCellOnBoard(currCell)) {
+              currCell = null;
+              validCell = true;
+            }
           }
         } else {
           if (!player1Funcs.isCellOnBoardAndNotPicked(currCell)) {
@@ -358,9 +386,16 @@ const getRealisticComputerAttack = (difficultyOptions, enemyPlayer) => {
         break;
     }
 
+    // If cell from reversed direction not valid.
+    // Guess surounding cells from last hit cell.
+    if (currCell === null && difficultyOptions.isHuntDirectionReversed) {
+      currCell = getCurrValidSurroundingGuess();
+    }
+
     // Cell was not valid.
-    // Reverse huntDirection and restart getGuessInDirection()
+    // Restart getGuessInDirection() to get the next cell
     if (currCell === null) {
+      difficultyOptions.isHuntDirectionReversed = true;
       reverseHuntDirection();
 
       // Guess will be retrieved via recursion.
@@ -413,68 +448,121 @@ const getRealisticComputerAttack = (difficultyOptions, enemyPlayer) => {
 
   var guess;
 
-  // Random guessing
+  // Hunt mode not active
+  // Guess: Guess randomly.
   if (!difficultyOptions.huntMode) {
     guess = getRandomComputerAttack(enemyPlayer);
   }
-  // Hunt mode is first activated
+
+  // Hunt mode active
+  // Last attack hit
+  // Not searching
+  // Guess: Guess the surrounding cells of the last hit.
+  // Start searching.
   else if (
     difficultyOptions.huntMode &&
     difficultyOptions.isLastAttackHit &&
-    difficultyOptions.prevHits.length === 1
+    !difficultyOptions.searching &&
+    !difficultyOptions.movingInDirection
   ) {
+    difficultyOptions.searching = true;
     guess = getCurrValidSurroundingGuess();
   }
-  // Hunt mode active, last guess was miss, prevHits is non empty, not using huntDirection.
+
+  // Hunt mode active
+  // Last attack miss
+  // Searching
+  // Guess: Guess the surrounding cells of the last hit.
   else if (
     difficultyOptions.huntMode &&
     !difficultyOptions.isLastAttackHit &&
-    difficultyOptions.prevHits.length !== 0 &&
+    difficultyOptions.searching &&
+    !difficultyOptions.movingInDirection
+  ) {
+    guess = getCurrValidSurroundingGuess();
+  }
+
+  // Hunt mode active
+  // Searching
+  // Guess: Start guessing around cells of the last hit.
+  else if (
+    difficultyOptions.huntMode &&
+    difficultyOptions.searching &&
+    !difficultyOptions.movingInDirection &&
     difficultyOptions.huntDirection === ""
   ) {
-    difficultyOptions.guessRight = false;
-    difficultyOptions.guessBelow = false;
-    difficultyOptions.guessLeft = false;
-    difficultyOptions.guessAbove = false;
     guess = getCurrValidSurroundingGuess();
   }
-  // Hunt mode active, going in a reverse direction, missed last attak
-  // Reset and go back to surrounding guesses
-  else if (
-    difficultyOptions.huntMode &&
-    difficultyOptions.huntDirection !== "" &&
-    !difficultyOptions.isLastAttackHit &&
-    difficultyOptions.isHuntDirectionReversed
-  ) {
-    difficultyOptions.isHuntDirectionReversed = false;
-    difficultyOptions.huntDirection = "";
 
-    difficultyOptions.guessRight = false;
-    difficultyOptions.guessBelow = false;
-    difficultyOptions.guessLeft = false;
-    difficultyOptions.guessAbove = false;
-    guess = getCurrValidSurroundingGuess();
-  }
-  // Hunt mode active, last guess was miss, reverse huntDirection
-  else if (
-    difficultyOptions.huntMode &&
-    !difficultyOptions.isLastAttackHit &&
-    difficultyOptions.huntDirection !== ""
-  ) {
-    difficultyOptions.isHuntDirectionReversed = true;
-
-    reverseHuntDirection();
-
-    guess = getGuessInDirection();
-  }
-
-  // Hunt mode has been active, last guess was hit
+  // Hunt mode active
+  // Last attack hit
+  // Searching
+  // Guess: Start guessing in the direction of the last hit.
   else if (
     difficultyOptions.huntMode &&
     difficultyOptions.isLastAttackHit &&
-    difficultyOptions.prevHits.length !== 0
+    difficultyOptions.searching &&
+    !difficultyOptions.movingInDirection
   ) {
+    difficultyOptions.searching = false;
+    difficultyOptions.movingInDirection = true;
+
     guess = getGuessInDirection();
+  }
+
+  // Hunt mode active
+  // Guessing in a direction
+  // Last attack hit
+  // Guess: Keep guessing in the guess direction
+  else if (
+    difficultyOptions.huntMode &&
+    !difficultyOptions.searching &&
+    difficultyOptions.movingInDirection &&
+    difficultyOptions.isLastAttackHit
+  ) {
+    difficultyOptions.searching = false;
+    difficultyOptions.movingInDirection = true;
+
+    guess = getGuessInDirection();
+  }
+
+  // Hunt mode active
+  // Guessing in direction
+  // Last attack miss
+  // Guess: Reverse direction and guess in that direction.
+  else if (
+    difficultyOptions.huntMode &&
+    !difficultyOptions.searching &&
+    difficultyOptions.movingInDirection &&
+    !difficultyOptions.isLastAttackHit &&
+    !difficultyOptions.isHuntDirectionReversed
+  ) {
+    difficultyOptions.isHuntDirectionReversed = true;
+    reverseHuntDirection();
+    guess = getGuessInDirection();
+  }
+
+  // Hunt mode active
+  // Guessing in REVERSED direction
+  // Last attack miss
+  // Guess: Guess the surrounding cells of the last hit and reset variables.
+  else if (
+    difficultyOptions.huntMode &&
+    !difficultyOptions.searching &&
+    difficultyOptions.movingInDirection &&
+    difficultyOptions.isHuntDirectionReversed &&
+    !difficultyOptions.isLastAttackHit
+  ) {
+    difficultyOptions.searching = true;
+    difficultyOptions.movingInDirection = false;
+    difficultyOptions.isHuntDirectionReversed = false;
+
+    guess = getCurrValidSurroundingGuess();
+  }
+
+  // Guess: Guess randomly.
+  else {
+    guess = getRandomComputerAttack(enemyPlayer);
   }
 
   return guess;
