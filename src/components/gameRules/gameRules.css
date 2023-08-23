@@ -1,9 +1,5 @@
 #game-rules {
-  margin: auto;
-  margin-top: 20px;
-  margin-bottom: 20px;
-
-  width: 80vw;
+  margin: 20px 100px;
 
   font-size: 1.1rem;
 }
@@ -19,4 +15,9 @@
 
 #game-rules > ul > li {
   margin: 5px 0;
+}
+
+/* Bolds the first word of the li rules. */
+#game-rules li span.bold {
+  font-weight: bold;
 }
