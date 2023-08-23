@@ -1,6 +1,7 @@
 import Cell from "./cell";
 
 import "./oneBoard.css";
+import previousHits from "./previousHits";
 
 const numToLetter = (num) => {
   return String.fromCharCode(num + 64);
@@ -15,6 +16,9 @@ const OneBoard = (playerName) => {
   playerTitle.innerHTML = playerName;
 
   boardContainer.appendChild(playerTitle);
+
+  const boardAndChart = document.createElement("div");
+  boardAndChart.classList.add("board-chart");
 
   const board = document.createElement("div");
   board.classList.add("board");
@@ -43,7 +47,10 @@ const OneBoard = (playerName) => {
     }
   }
 
-  boardContainer.appendChild(board);
+  boardAndChart.appendChild(board);
+  boardAndChart.appendChild(previousHits(playerName));
+
+  boardContainer.appendChild(boardAndChart);
 
   return boardContainer;
 };
