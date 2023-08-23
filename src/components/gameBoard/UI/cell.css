@@ -12,18 +12,23 @@
 }
 
 /* When playing, color of highlighted cell */
-.cell.active:hover {
+/* :active selector is for mobile */
+.cell.active:hover,
+.cell.active:active {
   background-color: lightgray;
 }
 
 /* When placing ship, color of a valid position to place a ship */
+/* :active selector is for mobile */
 .cell.valid:hover,
-.cell.highlight {
+.cell.highlight,
+.cell.active:active {
   background-color: rgb(114, 243, 114);
 }
 
 /* Color of an invalid position to palce ship. */
-.cell.invalid:hover {
+/* :active selector is for mobile */
+.cell.invalid:hover .cell.invalid:active {
   background-color: rgb(255, 73, 73);
 }
 
