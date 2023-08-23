@@ -14,13 +14,25 @@ const gameRules = () => {
   rules.classList.add("rules");
 
   const easyRule = document.createElement("li");
-  easyRule.innerHTML =
-    "Easy - In this mode, the computer will guess randomly, even if they get a hit.";
-  rules.appendChild(easyRule);
+  const boldWord1 = document.createElement("span");
+  boldWord1.classList.add("bold");
+  boldWord1.innerHTML = "Easy";
+  const text1 = document.createElement("span");
+  text1.innerHTML =
+    " - In this mode, the computer will guess randomly, even if they get a hit.";
+  easyRule.appendChild(boldWord1);
+  easyRule.appendChild(text1);
+  rules.append(easyRule);
 
   const realisticRule = document.createElement("li");
-  realisticRule.innerHTML =
-    "Realistic - In this mode, the computer will have a smarter AI and behave similar to a human player. They will guess near places they get a hit until they sink the ship.";
+  const boldWord2 = document.createElement("span");
+  boldWord2.classList.add("bold");
+  boldWord2.innerHTML = "Realistic";
+  const text2 = document.createElement("span");
+  text2.innerHTML =
+    " - In this mode, the computer will have a smarter AI and behave similar to a human player. They will guess near places they get a hit until they sink the ship.";
+  realisticRule.appendChild(boldWord2);
+  realisticRule.appendChild(text2);
   rules.appendChild(realisticRule);
 
   gameRulesContainer.appendChild(rules);
