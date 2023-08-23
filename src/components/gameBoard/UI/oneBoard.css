@@ -21,6 +21,12 @@
   padding: 10px 0;
 }
 
+/* Puts the board and the previous hits chart side by side */
+.board-chart {
+  display: flex;
+  flex-direction: row;
+}
+
 /* Stylings for mobile screen */
 @media screen and (max-width: 600px) {
   .board {
