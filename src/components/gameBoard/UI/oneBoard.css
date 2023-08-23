@@ -20,3 +20,11 @@
 
   padding: 10px 0;
 }
+
+/* Stylings for mobile screen */
+@media screen and (max-width: 600px) {
+  .board {
+    width: 75vw;
+    height: 75vw;
+  }
+}

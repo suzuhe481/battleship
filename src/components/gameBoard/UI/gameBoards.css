@@ -4,3 +4,13 @@
 
   justify-content: center;
 }
+
+/* Stylings for mobile screen */
+/* Changes boards to vertical orientation */
+@media screen and (max-width: 600px) {
+  .gameboards {
+    flex-direction: column;
+
+    align-items: center;
+  }
+}

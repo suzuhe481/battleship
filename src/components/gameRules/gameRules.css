@@ -21,3 +21,10 @@
 #game-rules li span.bold {
   font-weight: bold;
 }
+
+/* Stylings for mobile screen */
+@media screen and (max-width: 600px) {
+  #game-rules {
+    margin: 40px 10%;
+  }
+}
