@@ -5,7 +5,7 @@ import * as player1Funcs from "../player1/player1";
 const getComputerCellFromArray = (posArr) => {
   var letter = String(posArr[0]);
   var number = String(posArr[1]);
-  var queryString = `#player2-board > .board > .cell[data-letter="${letter}"][data-number="${number}"]`;
+  var queryString = `#player2-board .board > .cell[data-letter="${letter}"][data-number="${number}"]`;
 
   var cell = document.querySelector(queryString);
 
