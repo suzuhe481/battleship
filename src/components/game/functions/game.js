@@ -25,39 +25,30 @@ const timeBetweenTurns = 1000; // 1000
 const timeAddedOnShipDestroyed = 1000; // 1000
 
 // Debug variables for less time between turns
-// const timeBetweenTurns = 200;
-// const timeAddedOnShipDestroyed = 200;
+// const timeBetweenTurns = 50;
+// const timeAddedOnShipDestroyed = 50;
 
 // Debug
-// Place ships vertically starting at [C, 3] and
-// go right for this test
+// Computer places a custom first guess
 // var isFirstCompGuess = true;
 // var firstGuess = ["E", 5];
+// var firstGuess = ["J", 4];
 
 // Variables for realistic difficulty
 var difficultyOptions = {
   realisticDifficlty: true,
   huntMode: false,
   prevHits: [],
-  huntDirection: "",
-  isHuntDirectionReversed: false,
+  searching: false,
   isLastAttackHit: false,
   guessRight: false,
   guessBelow: false,
   guessLeft: false,
   guessAbove: false,
+  movingInDirection: false,
+  huntDirection: "",
+  isHuntDirectionReversed: false,
 };
-
-// var realisticDifficlty = true;
-// var huntMode = false;
-// var prevHits = [];
-// var huntDirection = "";
-// var isHuntDirectionReversed = false;
-// var isLastAttackHit = false;
-// var guessRight = false;
-// var guessBelow = false;
-// var guessLeft = false;
-// var guessAbove = false;
 
 // Allows the enemy board to be clicked.
 const enableEnemyBoard = () => {
@@ -84,7 +75,7 @@ const enableEnemyBoard = () => {
         difficultyOptions,
         enemyPlayer
       );
-      // Debug if statement
+      // Debug if statement for custom first move
       // if (isFirstCompGuess) {
       //   computerAttack = firstGuess;
       //   isFirstCompGuess = false;
@@ -177,29 +168,18 @@ const runAttack = (event) => {
     if (results.isSunk()) {
       setGameMessage(`\n The ${results.name} was sunk!`);
 
+      // Remove sunk ship's locations from prevHits
+      removeSunkShipFromPrevHits(results);
+
       // Adjusting variables for realistic difficulty
       if (currPlayer.name === "Computer") {
-        difficultyOptions.huntDirection = "";
-        difficultyOptions.guessRight = false;
-        difficultyOptions.guessBelow = false;
-        difficultyOptions.guessLeft = false;
-        difficultyOptions.guessAbove = false;
-        // isLastAttackHit is set to false to search surrounding cells
-        // from the last previous hit before sinking the ship.
-        difficultyOptions.isLastAttackHit = false;
-
-        // Remove sunk ship's locations from prevHits
-        removeSunkShipFromPrevHits(results);
-
-        // If prevHits array is empty
-        if (difficultyOptions.prevHits.length === 0) {
-          difficultyOptions.huntMode = false;
-        }
+        resetDifficultyOptionsAfterSunkShip();
       }
     }
 
     // Checks game win condition
     if (enemyPlayer.board.allShipsSunk()) {
+      resetDifficultyOptionsToNewGame();
       gameWon();
       return;
     }
@@ -679,6 +659,38 @@ const rotate = () => {
 
   // Back to picking ship
   pickShipLocations();
+};
+
+const resetDifficultyOptionsToNewGame = () => {
+  difficultyOptions.realisticDifficlty = false;
+  difficultyOptions.huntMode = false;
+  difficultyOptions.prevHits = [];
+  difficultyOptions.searching = false;
+  difficultyOptions.isLastAttackHit = false;
+  difficultyOptions.guessRight = false;
+  difficultyOptions.guessBelow = false;
+  difficultyOptions.guessLeft = false;
+  difficultyOptions.guessAbove = false;
+  difficultyOptions.movingInDirection = false;
+  difficultyOptions.huntDirection = "";
+  difficultyOptions.isHuntDirectionReversed = false;
+};
+
+const resetDifficultyOptionsAfterSunkShip = () => {
+  // If prevHits array is empty
+  if (difficultyOptions.prevHits.length === 0) {
+    difficultyOptions.huntMode = false;
+    difficultyOptions.searching = false;
+  }
+
+  difficultyOptions.huntDirection = "";
+  difficultyOptions.movingInDirection = false;
+  difficultyOptions.isHuntDirectionReversed = false;
+
+  difficultyOptions.guessRight = false;
+  difficultyOptions.guessBelow = false;
+  difficultyOptions.guessLeft = false;
+  difficultyOptions.guessAbove = false;
 };
 
 export {
