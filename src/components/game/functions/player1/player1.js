@@ -7,7 +7,7 @@ const getPlayer1CellElementFromArray = (posArr) => {
   var letter = String(posArr[0]);
   var number = String(posArr[1]);
 
-  var queryString = `#player1-board > .board > .cell.playable-cell[data-letter="${letter}"][data-number="${number}"]`;
+  var queryString = `#player1-board > .board > .cell[data-letter="${letter}"][data-number="${number}"]`;
 
   var cell = document.querySelector(queryString);
 
@@ -123,6 +123,19 @@ const isCellOnBoardAndNotPicked = (pos) => {
   return true;
 };
 
+// Given an array of a cell's position,
+// Returns true if the cell is on the board.
+const isCellOnBoard = (pos) => {
+  var cellElement = getPlayer1CellElementFromArray(pos);
+
+  // Not on board.
+  if (cellElement === null) {
+    return false;
+  }
+
+  return true;
+};
+
 export {
   getPlayer1CellElementFromArray,
   getPlayer1RightCellElement,
@@ -134,4 +147,5 @@ export {
   getBelowCellArray,
   getAboveCellArray,
   isCellOnBoardAndNotPicked,
+  isCellOnBoard,
 };
