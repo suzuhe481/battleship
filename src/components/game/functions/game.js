@@ -59,7 +59,7 @@ const enableEnemyBoard = () => {
 
   // Player 1 turn - Turn on enemy board.
   if (currPlayer.name === "Player 1") {
-    var p2Cells = "#player2-board > .board > .cell.playable-cell";
+    var p2Cells = "#player2-board .board > .cell.playable-cell";
     var playableCells = document.querySelectorAll(p2Cells);
 
     // "active" class enables color change on hover.
@@ -91,10 +91,10 @@ const enableEnemyBoard = () => {
 // Disables the enemy board from being clicked.
 const disableEnemyBoard = () => {
   if (enemyPlayer.name === "Player 1") {
-    var p1Cells = "#player1-board > .board > .cell.playable-cell";
+    var p1Cells = "#player1-board .board > .cell.playable-cell";
     var playableCells = document.querySelectorAll(p1Cells);
   } else {
-    var p2Cells = "#player2-board > .board > .cell.playable-cell";
+    var p2Cells = "#player2-board .board > .cell.playable-cell";
     var playableCells = document.querySelectorAll(p2Cells);
   }
 
@@ -139,6 +139,7 @@ const runAttack = (event) => {
   // Attack was a miss
   if (results === null) {
     setGameMessage(`Attack at [${coordinates}] missed.`);
+    addHitToChart(`[${coordinates}] - Miss`);
 
     // Adjusting variables for realistic difficulty
     if (currPlayer.name === "Computer") {
@@ -152,6 +153,7 @@ const runAttack = (event) => {
   // Attack was a hit
   else {
     setGameMessage(`Attack at [${coordinates}] hit!`);
+    addHitToChart(`[${coordinates}] - Hit`);
 
     // Adjusting variables for realistic difficulty
     if (currPlayer.name === "Computer") {
@@ -167,6 +169,10 @@ const runAttack = (event) => {
     // Checks is ship was sunk
     if (results.isSunk()) {
       setGameMessage(`\n The ${results.name} was sunk!`);
+      // Capitalizes first word of the ship name.
+      addHitToChart(
+        `${results.name.charAt(0).toUpperCase() + results.name.slice(1)} Sunk!`
+      );
 
       // Remove sunk ship's locations from prevHits
       removeSunkShipFromPrevHits(results);
@@ -353,7 +359,7 @@ const isSpaceOccupied = (cell) => {
 // First - All valid cell elements for horizontal placement.
 // Second - All invalid cell elements for horizontal placement.
 const getValidandInvalidHorizontalCells = () => {
-  var queryString = "#player1-board > .board > .cell.playable-cell";
+  var queryString = "#player1-board .board > .cell.playable-cell";
   var player1Cells = document.querySelectorAll(queryString);
 
   var validCells = [];
@@ -401,7 +407,7 @@ const getValidandInvalidHorizontalCells = () => {
 // First - All valid cell elements for vertical placement.
 // Second - All invalid cell elements for vertical placement.
 const getValidandInvalidVerticalCells = () => {
-  var queryString = "#player1-board > .board > .cell.playable-cell";
+  var queryString = "#player1-board .board > .cell.playable-cell";
   var player1Cells = document.querySelectorAll(queryString);
 
   var validCells = [];
@@ -475,6 +481,33 @@ const setGameTurnStatus = (message) => {
 
   gameTurnBox.innerHTML = "";
   gameTurnBox.innerHTML = message;
+};
+
+// Adds last hit to the appropriate chart.
+const addHitToChart = (message) => {
+  if (currPlayer.name === "Player 1") {
+    var chart = document.getElementById("player1-chart");
+  } else {
+    var chart = document.getElementById("player2-chart");
+  }
+
+  var guess = document.createElement("li");
+  guess.classList.add("guess");
+  guess.innerHTML = message;
+
+  // If sunk message, adds additional class
+  if (message.includes("Sunk")) {
+    guess.classList.add("sunk");
+  }
+
+  chart.appendChild(guess);
+
+  // Removes the 2nd "li" item if the list has more than the specified number of "li".
+  // Deletes second to skip player name.
+  if (chart.childElementCount > 11) {
+    var guessToRemove = chart.childNodes[1];
+    chart.removeChild(guessToRemove);
+  }
 };
 
 // Places and stores a ship on a valid click.
