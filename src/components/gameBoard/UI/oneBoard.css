@@ -1,8 +1,12 @@
+.board-container {
+  margin: 0 20px;
+}
+
 .board {
   display: grid;
 
-  height: 45vw;
-  width: 45vw;
+  height: 35vw;
+  width: 35vw;
 
   border: 2px solid black;
 
