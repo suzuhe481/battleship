@@ -187,7 +187,7 @@ const getRealisticComputerAttack = (difficultyOptions, enemyPlayer) => {
     var lastHit =
       difficultyOptions.prevHits[difficultyOptions.prevHits.length - 1];
 
-    var currCell;
+    var currCell = null;
     // Get right cell if valid and not previously picked
     if (!difficultyOptions.guessRight) {
       currCell = player1Funcs.getRightCellArray(lastHit);
