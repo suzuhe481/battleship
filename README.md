@@ -26,6 +26,10 @@ If a ship is destroyed, the name of the ship will be displayed.
 
 ## Releases
 
+### Release 4
+
+- Fixed bug that crashed game during gameplay if ships were placed next to each other horizontally.
+
 ### Release 3
 
 - Improved appearance on mobile.
